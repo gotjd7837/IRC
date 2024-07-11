@@ -153,7 +153,7 @@ void Server::receive_new_data(int fd)
 	char buff[1024]; //-> buffer for the received data
 	memset(buff, 0, sizeof(buff)); //-> clear the buffer
 
-    //소켓 프로그래밍에서 연결된 소켓에서 데이터를 수신하는데 사용
+    //연결된 소켓에서 데이터를 수신하는데 사용
 	ssize_t bytes = recv(fd, buff, sizeof(buff) - 1 , 0); //데이터를 receive하는 함수, 읽은 바이트 크기를 반환
 
 	if(bytes <= 0){ //클라이언트가 연결을 끊었거나 에러 발생한 상황
@@ -163,7 +163,9 @@ void Server::receive_new_data(int fd)
 	}
 	else{ //-> print the received data
 		buff[bytes] = '\0';
-		std::cout << YEL << "Client <" << fd << "> Data: " << WHI << buff;
+		std::cout << YEL << "Client <" << fd << "> Data: " << WHI << buff << std::endl;
+		send(fd, buff, bytes, 0); //-> send the received data back to the client
+
 		//here you can add your code to process the received data: parse, check, authenticate, handle the command, etc...
 	}
 }
