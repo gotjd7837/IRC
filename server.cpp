@@ -22,54 +22,10 @@ void Server::closeFds()
     // close(_serverSocket);
 }
 
-void Server::removeClients(int clifd)
+
+Client* Server::getClient(int clientFd)
 {
-    delete _clients[clifd];
-    _clients.erase(clifd);
-
-    for (int i = 0; i < _pollFds.size(); i++)
-    {
-        if (_pollFds[i].fd == clifd)
-        {
-            _pollFds.erase(_pollFds.begin() + i);
-            break;
-        }
-    }
-}
-
-void Server::recvData(int clifd)
-{
-    char buffer[1024];
-    std::string message_buffer;
-
-    int ret = recv(clifd, buffer, sizeof(buffer) - 1, 0); //-> receive data from the client
-    if (ret == -1)
-        throw(std::runtime_error("recv() faild"));
-    else if (ret == 0) // 클라이언트에서 소켓 close() 호출, 정상 종료
-    {
-        removeClients(clifd);
-        std::cout << RED << "client <" << clifd << "> disconnected" << WHI << std::endl;
-        close(clifd);
-    }
-    else
-    {
-        buffer[ret] = '\0';
-        std::cout << GRE << "Received message: " << buffer << WHI << std::endl;
-        send(clifd, buffer, ret, 0);
-        // message_buffer += buffer;
-
-        // size_t pos;
-        // while ((pos = message_buffer.find("\r\n")) != std::string::npos)
-        // {
-        //     std::string complete_message = message_buffer.substr(0, pos);
-        //     message_buffer.erase(0, pos + 2);
-
-        //     std::cout << GRE << "Received message: " << complete_message << WHI << std::endl;
-
-        //     std::string response = "Message received: " + complete_message + "\r\n";
-        //     send(clifd, response.c_str(), response.length(), 0);
-        // }
-    }
+    return (_clients[clientFd]);
 }
 
 void Server::addClient()
@@ -128,6 +84,192 @@ void Server::serverSocket()
 	_pollFds.push_back(new_poll); //-> add the server socket to the pollfd
 }
 
+
+
+
+
+
+
+
+// 문자열 벡터 params를 반환
+std::vector<std::string> Server::makeParams(std::string completeMessage)
+{
+    std::vector<std::string> params;
+    std::string tmp = "";
+
+    if (completeMessage.size() == 0 || completeMessage[0] != ' ')
+        throw (std::runtime_error("클라이언트 메세지 형식 err"));
+    
+    for (int i = 0; i < completeMessage.size(); i++)
+    {
+        if (completeMessage[i] == ' ')
+            continue ;
+        else if (completeMessage[i] == ':')
+        {
+            tmp = completeMessage.substr(i);
+            params.push_back(tmp);
+            return (params);
+        }
+        else
+        {
+            while (i < completeMessage.size() && completeMessage[i] != ' ')
+                tmp += completeMessage[i++];
+            params.push_back(tmp);
+            tmp.clear();
+        }
+    }
+    return (params);
+}
+
+std::string Server::makeCommand(std::string& completeMessage)
+{
+    std::string command = "";
+    int i = 0;
+
+    while (i != completeMessage.size())
+    {
+        if (completeMessage[i] == ' ')
+            break ;
+        command += completeMessage[i];
+        i++;
+    }
+    completeMessage = completeMessage.substr(i, completeMessage.length() - i);
+    return (command);
+}
+
+// completemessage에서 prefix를 추출해서 반환, completemessage는 prefix를 제외하고 저장됨
+std::string Server::makePrefix(std::string& completeMessage)
+{
+    std::string prefix = "";
+    int i = 0;
+
+    if (completeMessage[0] != ':')
+        prefix = "";
+    else
+    {
+        while (i != completeMessage.size())
+        {
+            prefix += completeMessage[i]; 
+            i++;
+            if (completeMessage[i] != ' ' && completeMessage[i - 1] == ' ')
+                break ;
+        }
+        completeMessage = completeMessage.substr(i, completeMessage.length() - i);
+    }
+    return (prefix);
+}
+
+// client의 버퍼와 현재 recv한 메세지를 combine해서 클라이언트 객체에 저장, 반환
+std::string Server::makeCombinedMessage(std::string clientMessage, int clientFd)
+{
+    std::string remainMessage = getClient(clientFd)->popMessageBuff();
+    remainMessage += clientMessage;
+    return (remainMessage);
+}
+
+// server에서 특정 client 삭제
+void Server::removeClient(int clientFd)
+{
+    std::cout << "disconnect [" << clientFd << "] Client" << "\n";
+
+    delete _clients[clientFd];
+    _clients.erase(clientFd);
+
+    for (int i = 0; i < _pollFds.size(); i++)
+    {
+        if (_pollFds[i].fd == clientFd)
+        {
+            _pollFds.erase(_pollFds.begin() + i);
+            break ;
+        }
+    }
+}
+
+// target client 소켓에서 메세지 recv
+std::string Server::recvClientMessage(int clientFd)
+{
+    char    buff[512];
+    int     readLen;
+    std::string receivedMessage = "";
+
+    while (1)
+    {
+        readLen = recv(clientFd, buff, sizeof(buff), 0);
+        if (readLen < 0)
+        {
+            if (errno == EAGAIN) //recv 소켓의 데이터를 모두 읽었음을 의미
+                break ;
+            else
+                throw(std::runtime_error("recv() faild"));
+        }
+        else if (readLen == 0) // 반환값 '0'인 경우 client disconnect를 의미
+            return ("");
+        else
+        {
+            std::string tmp(buff, readLen);
+            receivedMessage += tmp;
+        }
+    }
+    return (receivedMessage);
+}
+
+// 본격적인 파싱, combined 메세지에서 irc프로토콜의 메세지를 분리 후 파싱, 남은건 client 버퍼에 저장
+void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
+{
+    std::string message;
+    
+    for (int i = 0; i < combinedMessage.size(); i++)
+    {
+        message += combinedMessage[i];
+        if (1 < message.size() && message[message.size() - 1] == '\n' && message[message.size() - 2] == '\r')
+        {
+            std::string completeMessage = message.substr(0, message.size() - 2);
+
+            std::string prefix = makePrefix(completeMessage);
+            std::string command = makeCommand(completeMessage);
+            std::vector<std::string> params = makeParams(completeMessage);
+            //파싱된 데이터를 이용한 로직 구현부분
+
+            message.clear();
+        }
+    }
+    getClient(clientFd)->pushMessageBuff(message);
+    return ;
+}
+
+// client request 처리
+void Server::handleClientRequest(int targetFd)
+{
+    std::cout << "handle client request...\n";
+    std::string clientMessage = recvClientMessage(targetFd); // target 소켓에서 데이터 recv
+
+    if (clientMessage.size() == 0) // 소켓 이벤트 POLLIN의 메세지가 "" 빈문자열 메세지일 경우 disconnect를 의미
+    {
+        removeClient(targetFd);
+        return ;
+    }
+
+    std::string combinedMessage = makeCombinedMessage(clientMessage, targetFd);
+    handleCombinedMessage(combinedMessage, targetFd);
+    return ;
+}
+
+void Server::handleEvent()
+{
+    for (int i = 0; i < _pollFds.size(); i++)
+    {
+        if (_pollFds[i].revents & POLLIN)
+        {
+            if (_pollFds[i].fd == _serverSocket)
+                addClient();
+            else
+                handleClientRequest(_pollFds[i].fd);
+        }
+        // if (_pollFds[i].revents & POLLOUT)
+        //     sendServerCommand(_pollFds[i].fd);
+    }
+}
+
 void Server::serverInit()
 {
     serverSocket();
@@ -137,20 +279,9 @@ void Server::serverInit()
 
     while (_signal == false)
     {
-        if((poll(&_pollFds[0], _pollFds.size(),-1) == -1) && _signal == false) //-> wait for an event
+        if((poll(&_pollFds[0], _pollFds.size(), -1) == -1) && _signal == false) //-> wait for an event
 			throw(std::runtime_error("poll() faild"));
-
-        for (size_t i = 0; i < _pollFds.size(); i++) //-> check all file descriptors
-		{
-			if (_pollFds[i].revents & POLLIN)//-> check if there is data to read
-			{
-				if (_pollFds[i].fd == _serverSocket)
-					addClient(); //서버 소켓에서 입력이 들어왔으므로 새 클라이언트 추가
-				else
-					recvData(_pollFds[i].fd); //클라이언트 소켓에서 입력이 들어왔으므로 데이터 receive
-				//클라이언트를 통해 받은 데이터를 통해 서버가 데이터를
-			}
-		}
+        handleEvent();
     }
 }
 

@@ -17,6 +17,8 @@ class Client
     private :
         int _fd;
         std::string _ipadd;
+
+        std::string _messageBuff;
     
     public :
         Client();
@@ -24,6 +26,10 @@ class Client
 
         void setfd(int fd);
         void setipadd(std::string ipadd);
+
+        std::string popMessageBuff();
+        void pushMessageBuff(std::string& message);
+
 };
 
 #endif
