@@ -228,12 +228,18 @@ void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
             std::string prefix = makePrefix(completeMessage);
             std::string command = makeCommand(completeMessage);
             std::vector<std::string> params = makeParams(completeMessage);
-            //파싱된 데이터를 이용한 로직 구현부분
+            //파싱된 데이터를 이용한 로직 구현부분 .. 일단 파싱 데이터를 하나로 묶는 클래스 ?
 
+        
             message.clear();
         }
     }
+    // cr-lf가 없는 message는 client 객체에 저장
     getClient(clientFd)->pushMessageBuff(message);
+
+    // cr-lf가 입력되지 않아서 클라이언트 객체에 저장된 msg를 pop하는 테스트
+    // std::cout << "클라이언트 임시 버퍼 pop! :" << _clients[clientFd]->popMessageBuff() << std::endl;
+
     return ;
 }
 
@@ -265,8 +271,6 @@ void Server::handleEvent()
             else
                 handleClientRequest(_pollFds[i].fd);
         }
-        // if (_pollFds[i].revents & POLLOUT)
-        //     sendServerCommand(_pollFds[i].fd);
     }
 }
 
