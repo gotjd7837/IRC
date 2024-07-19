@@ -6,6 +6,13 @@ bool Server::_signal = false;
 
 Server::Server() : _serverSocket(-1) {}
 
+Server::Server(std::string password, std::string port) : _password(password), _port(port), _serverSocket(-1) {}
+
+Server::~Server()
+{
+    //메모리 해제
+}
+
 void Server::signalHandler(int signal)
 {
     (void)signal;
@@ -103,7 +110,7 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
 {
     std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
 
-    int (Server::*func[13])(MessageProtocol, int) = {
+    void (Server::*func[13])(MessageProtocol, int) = {
         // &Server::cmdInvite,
         // &Server::cmdJoin,
         // &Server::cmdKick,

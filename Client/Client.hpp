@@ -17,7 +17,10 @@ class Client
     private :
         int _fd;
         std::string _ipadd;
-
+        std::string _nickname;
+        std::string _username;
+        std::string _realname;
+        // std::string _host;
         std::string _messageBuff;
     
     public :
@@ -29,6 +32,8 @@ class Client
 
         std::string popMessageBuff();
         void pushMessageBuff(std::string& message);
+
+        void reply(std::string message);
 
 };
 

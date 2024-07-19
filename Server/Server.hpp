@@ -27,11 +27,16 @@ class Server
     private :
         int _serverSocket;
         static bool _signal;
+        std::string _password;
+        std::string _port;
+
         std::map<int, Client *> _clients;
         std::vector<struct pollfd> _pollFds;
 
     public :
         Server();
+        Server(std::string password, std::string port);
+        ~Server();
 
         static void signalHandler(int _signal);
 
@@ -50,6 +55,8 @@ class Server
 
         // command
         void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd);
+        void Server::cmdPass(MessageProtocol parsedMessage, int clientFd);
+        void Server::cmdUser(MessageProtocol parsedMessage, int clientFd);
 };
 
 
