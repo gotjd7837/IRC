@@ -20,6 +20,7 @@
 #define SERVER_PORT 6667
 
 class Client;
+class MessageProtocol;
 
 class Server
 {
@@ -41,18 +42,14 @@ class Server
         Client* getClient(int clientFd);
         void removeClient(int clientFd);
 
-        void closeFds();
-
-        // massage parsing
         void handleEvent();
         void handleClientRequest(int targetFd);
         std::string recvClientMessage(int clientFd);
         std::string makeCombinedMessage(std::string clientMessage, int clientFd);
         void handleCombinedMessage(std::string combinedMessage, int clientFd);
 
-        std::string makePrefix(std::string& completeMessage);
-        std::string makeCommand(std::string& completemessage);
-        std::vector<std::string> makeParams(std::string completeMessage);
+        // command
+        void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd);
 };
 
 

@@ -1,5 +1,6 @@
-#include "server.hpp"
-#include "client.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
+#include "MessageProtocol.hpp"
 
 bool Server::_signal = false;
 
@@ -12,20 +13,27 @@ void Server::signalHandler(int signal)
     _signal = true;
 }
 
-void Server::closeFds()
-{
-    // for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); it++)
-    // {
-    //     close(it->first);
-    // }
-    // std::cout << RED << "Server <" << _serverSocket << "> Disconnected" << WHI << std::endl;
-    // close(_serverSocket);
-}
-
-
 Client* Server::getClient(int clientFd)
 {
     return (_clients[clientFd]);
+}
+
+// server에서 특정 client 삭제
+void Server::removeClient(int clientFd)
+{
+    std::cout << "disconnect [" << clientFd << "] Client" << "\n";
+
+    delete _clients[clientFd];
+    _clients.erase(clientFd);
+
+    for (int i = 0; i < _pollFds.size(); i++)
+    {
+        if (_pollFds[i].fd == clientFd)
+        {
+            _pollFds.erase(_pollFds.begin() + i);
+            break ;
+        }
+    }
 }
 
 void Server::addClient()
@@ -46,7 +54,6 @@ void Server::addClient()
     new_poll.fd = new_fd; //-> add the new client socket to the pollfd
     new_poll.events = POLLIN; //-> set the event to POLLIN for reading data
     new_poll.revents = 0; //-> set the revents to 0
-
     _pollFds.push_back(new_poll); //-> add the new client socket to the pollfd
 
     cli->setfd(new_fd);
@@ -91,73 +98,40 @@ void Server::serverSocket()
 
 
 
-// 문자열 벡터 params를 반환
-std::vector<std::string> Server::makeParams(std::string completeMessage)
+// command 처리 인터페이스
+void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
 {
-    std::vector<std::string> params;
-    std::string tmp = "";
+    std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
 
-    if (completeMessage.size() == 0 || completeMessage[0] != ' ')
-        throw (std::runtime_error("클라이언트 메세지 형식 err"));
-    
-    for (int i = 0; i < completeMessage.size(); i++)
+    int (Server::*func[13])(MessageProtocol, int) = {
+        // &Server::cmdInvite,
+        // &Server::cmdJoin,
+        // &Server::cmdKick,
+        // &Server::cmdMode,
+        // &Server::cmdNick,
+        // &Server::cmdPart,
+        // &Server::cmdPass,
+        // &Server::cmdPing,
+        // &Server::cmdPong,
+        // &Server::cmdPrivmsg,
+        // &Server::cmdQuit,
+        // &Server::cmdTopic,
+        // &Server::cmdUser
+    };
+
+    for (int i = 0; i < 13; i++)
     {
-        if (completeMessage[i] == ' ')
-            continue ;
-        else if (completeMessage[i] == ':')
+        if (parsedMessage.getCommand() == cmd[i])
         {
-            tmp = completeMessage.substr(i);
-            params.push_back(tmp);
-            return (params);
-        }
-        else
-        {
-            while (i < completeMessage.size() && completeMessage[i] != ' ')
-                tmp += completeMessage[i++];
-            params.push_back(tmp);
-            tmp.clear();
+            (this->*func[i])(parsedMessage, clientFd);
+            return ;
         }
     }
-    return (params);
 }
 
-std::string Server::makeCommand(std::string& completeMessage)
-{
-    std::string command = "";
-    int i = 0;
 
-    while (i != completeMessage.size())
-    {
-        if (completeMessage[i] == ' ')
-            break ;
-        command += completeMessage[i];
-        i++;
-    }
-    completeMessage = completeMessage.substr(i, completeMessage.length() - i);
-    return (command);
-}
 
-// completemessage에서 prefix를 추출해서 반환, completemessage는 prefix를 제외하고 저장됨
-std::string Server::makePrefix(std::string& completeMessage)
-{
-    std::string prefix = "";
-    int i = 0;
 
-    if (completeMessage[0] != ':')
-        prefix = "";
-    else
-    {
-        while (i != completeMessage.size())
-        {
-            prefix += completeMessage[i]; 
-            i++;
-            if (completeMessage[i] != ' ' && completeMessage[i - 1] == ' ')
-                break ;
-        }
-        completeMessage = completeMessage.substr(i, completeMessage.length() - i);
-    }
-    return (prefix);
-}
 
 // client의 버퍼와 현재 recv한 메세지를 combine해서 클라이언트 객체에 저장, 반환
 std::string Server::makeCombinedMessage(std::string clientMessage, int clientFd)
@@ -165,24 +139,6 @@ std::string Server::makeCombinedMessage(std::string clientMessage, int clientFd)
     std::string remainMessage = getClient(clientFd)->popMessageBuff();
     remainMessage += clientMessage;
     return (remainMessage);
-}
-
-// server에서 특정 client 삭제
-void Server::removeClient(int clientFd)
-{
-    std::cout << "disconnect [" << clientFd << "] Client" << "\n";
-
-    delete _clients[clientFd];
-    _clients.erase(clientFd);
-
-    for (int i = 0; i < _pollFds.size(); i++)
-    {
-        if (_pollFds[i].fd == clientFd)
-        {
-            _pollFds.erase(_pollFds.begin() + i);
-            break ;
-        }
-    }
 }
 
 // target client 소켓에서 메세지 recv
@@ -216,30 +172,20 @@ std::string Server::recvClientMessage(int clientFd)
 // 본격적인 파싱, combined 메세지에서 irc프로토콜의 메세지를 분리 후 파싱, 남은건 client 버퍼에 저장
 void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
 {
-    std::string message;
+    std::string tmp;
     
     for (int i = 0; i < combinedMessage.size(); i++)
     {
-        message += combinedMessage[i];
-        if (1 < message.size() && message[message.size() - 1] == '\n' && message[message.size() - 2] == '\r')
+        tmp += combinedMessage[i];
+        if (1 < tmp.size() && tmp[tmp.size() - 1] == '\n' && tmp[tmp.size() - 2] == '\r') // cr-lf가 있는 완전한 메세지는 excuteCommand로 전달
         {
-            std::string completeMessage = message.substr(0, message.size() - 2);
-
-            std::string prefix = makePrefix(completeMessage);
-            std::string command = makeCommand(completeMessage);
-            std::vector<std::string> params = makeParams(completeMessage);
-            //파싱된 데이터를 이용한 로직 구현부분 .. 일단 파싱 데이터를 하나로 묶는 클래스 ?
-
-        
-            message.clear();
+            std::string completeMessage = tmp.substr(0, tmp.size() - 2);
+            excuteCommand(MessageProtocol(completeMessage), clientFd);
+            tmp.clear();
         }
     }
-    // cr-lf가 없는 message는 client 객체에 저장
-    getClient(clientFd)->pushMessageBuff(message);
-
-    // cr-lf가 입력되지 않아서 클라이언트 객체에 저장된 msg를 pop하는 테스트
-    // std::cout << "클라이언트 임시 버퍼 pop! :" << _clients[clientFd]->popMessageBuff() << std::endl;
-
+    // cr-lf가 없는 message는 client 객체 _messageBuff에 저장
+    getClient(clientFd)->pushMessageBuff(tmp);
     return ;
 }
 
