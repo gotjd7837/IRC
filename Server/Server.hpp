@@ -25,8 +25,9 @@ class MessageProtocol;
 class Server
 {
     private :
-        int _serverSocket;
         static bool _signal;
+
+        int _serverSocket;
         std::string _password;
         std::string _port;
 
@@ -55,8 +56,8 @@ class Server
 
         // command
         void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd);
-        void Server::cmdPass(MessageProtocol parsedMessage, int clientFd);
-        void Server::cmdUser(MessageProtocol parsedMessage, int clientFd);
+        void Server::cmdPass(MessageProtocol& parsedMessage, int clientFd);
+        void Server::cmdUser(MessageProtocol& parsedMessage, int clientFd);
 };
 
 

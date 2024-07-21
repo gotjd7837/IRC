@@ -6,7 +6,7 @@ bool Server::_signal = false;
 
 Server::Server() : _serverSocket(-1) {}
 
-Server::Server(std::string password, std::string port) : _password(password), _port(port), _serverSocket(-1) {}
+Server::Server(std::string port, std::string password) : _password(password), _port(port), _serverSocket(-1) {}
 
 Server::~Server()
 {
@@ -136,6 +136,20 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
     }
 }
 
+/*
+PASS : 서버에 연결하기 위한 패스워드를 확인한다.
+NICK : 닉네임을 변경한다.
+USER : 유저 이름을 변경한다.
+JOIN : 채널에 입장한다.
+PART : 채널에서 나간다.
+PRIVMSG : 특정 사용자 또는 채널에 메시지를 보낸다.
+NOTICE : 서버의 유저에게 메시지를 보낸다.
+LIST : 현재 서버에서 사용 가능한 채널 목록을 조회한다.
+PING : 클라이언트-서버 간의 연결을 확인한다.
+OPER : 관리자 권한을 얻는다.
+KICK : 유저를 특정 채널에서 내보낸다.
+QUIT : IRC 서버에서 나간다.
+*/
 
 
 
@@ -155,23 +169,13 @@ std::string Server::recvClientMessage(int clientFd)
     int     readLen;
     std::string receivedMessage = "";
 
-    while (1)
+    readLen = recv(clientFd, buff, sizeof(buff), 0);
+    if (readLen <= 0)
+        return ("");
+    else
     {
-        readLen = recv(clientFd, buff, sizeof(buff), 0);
-        if (readLen < 0)
-        {
-            if (errno == EAGAIN) //recv 소켓의 데이터를 모두 읽었음을 의미
-                break ;
-            else
-                throw(std::runtime_error("recv() faild"));
-        }
-        else if (readLen == 0) // 반환값 '0'인 경우 client disconnect를 의미
-            return ("");
-        else
-        {
-            std::string tmp(buff, readLen);
-            receivedMessage += tmp;
-        }
+        std::string tmp(buff, readLen);
+        receivedMessage += tmp;
     }
     return (receivedMessage);
 }
