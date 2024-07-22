@@ -67,6 +67,7 @@ class Server
         void codeMsgReply(int clientFd, int code);
         void sendMsg(int clientFd, char *code, std::string nick, char *msg);
         void bcastMsg(std::string msg);
+        void ucastMsg(int clientFd, std::string msg)
 };
 
 

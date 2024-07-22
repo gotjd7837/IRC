@@ -39,8 +39,7 @@
 
 void Server::sendMsg(int clientFd, char *code, std::string nick, char *msg)
 {
-    // if (send(clientFd, std::string(":", _name, " ", code, " ", nick, " ", msg , "\n")) < 0)
-    //     throw(std::runtime_error("send() failed"));
+    ucastMsg(clientFd, ":"+ _name + " " + std::string(code) + " " + nick + " " + std::string(msg));
 }
 
 void Server::codeMsgReply(int clientFd, int code)

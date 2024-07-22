@@ -41,6 +41,8 @@ void Server::removeClient(int clientFd)
             break ;
         }
     }
+    
+    close(clientFd);
 }
 
 void Server::addClient()
