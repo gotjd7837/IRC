@@ -4,5 +4,5 @@
 
 void Server::cmdPong(MessageProtocol& parsedMessage, int clientFd)
 {
-    ucastMsg(clientFd, std::string(parsedMessage.getParams()[0]));
+    ucastMsg(clientFd, std::string("PONG" + parsedMessage.getParams()[0]));
 }
