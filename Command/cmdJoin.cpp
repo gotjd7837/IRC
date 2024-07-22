@@ -50,15 +50,25 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
         Channel* channel = _channels.find(targetChannel)->second;
         if (targetKey == channel->getKey())
         {
+            std::string users = "";
+            for(std::map<Client *, bool>::const_iterator it = channel->getMembers().begin(); it != channel->getMembers().end(); it++)
+            {
+                if (it->second)
+                    users += "@";
+                users += it->first->getNick() + " ";
+
+                ucastMsg(it->first->getFd(), std::string(":" + cli->getNick() + "JOIN " + targetChannel));
+            }
+
             channel->addMember(cli, op);
             ucastMsg(clientFd, std::string("332 " + targetChannel + " :" + "Welcome to the Foobar channel!"));
 
-            std::string users = "";
-            for(std::map<Client *, bool>::const_iterator it = channel->getMembers().begin(); it != channel->getMembers().end(); it++)
-                users += it->first->getNick() + " ";
+            if (op)
+                users += "@";
+            users += cli->getNick();
             ucastMsg(clientFd, std::string("353 " + targetChannel + " :" + users));
-
-            ucastMsg(clientFd, std::string("363 " + targetChannel + " :" + "End of /NAMES list"));
+    
+            ucastMsg(clientFd, std::string("366 " + targetChannel + " :" + "End of /NAMES list"));
         }
         else
             codeMsgReply(clientFd, 475);

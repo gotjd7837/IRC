@@ -130,6 +130,8 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         cmdUser(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "PING")
         cmdPong(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "JOIN")
+        cmdJoin(parsedMessage, clientFd);
 
 
     // std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
