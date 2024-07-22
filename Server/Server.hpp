@@ -25,9 +25,8 @@ class MessageProtocol;
 class Server
 {
     private :
-        static bool _signal;
-
         int _serverSocket;
+        static bool _signal;
         std::string _password;
         std::string _port;
 

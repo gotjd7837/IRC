@@ -108,9 +108,15 @@ void Server::serverSocket()
 // command 처리 인터페이스
 void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
 {
-    std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
+    std::cout << "prefix : " << parsedMessage.getPrefix() << std::endl;
+    std::cout << "command : " << parsedMessage.getCommand() << std::endl;
+    for (size_t i = 0; i < parsedMessage.getParams().size(); i++)
+        std::cout << "params : " << parsedMessage.getParams()[i] << std::endl;
 
-    void (Server::*func[13])(MessageProtocol, int) = {
+
+    // std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
+
+    // void (Server::*func[13])(MessageProtocol, int) = {
         // &Server::cmdInvite,
         // &Server::cmdJoin,
         // &Server::cmdKick,
@@ -124,16 +130,16 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         // &Server::cmdQuit,
         // &Server::cmdTopic,
         // &Server::cmdUser
-    };
+    // };
 
-    for (int i = 0; i < 13; i++)
-    {
-        if (parsedMessage.getCommand() == cmd[i])
-        {
-            (this->*func[i])(parsedMessage, clientFd);
-            return ;
-        }
-    }
+    // for (int i = 0; i < 13; i++)
+    // {
+    //     if (parsedMessage.getCommand() == cmd[i])
+    //     {
+    //         (this->*func[i])(parsedMessage, clientFd);
+    //         return ;
+    //     }
+    // }
 }
 
 /*
