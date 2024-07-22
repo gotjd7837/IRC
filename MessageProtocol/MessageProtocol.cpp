@@ -30,7 +30,7 @@ MessageProtocol& MessageProtocol::operator=(const MessageProtocol& other)
 
 void MessageProtocol::makePrefix()
 {
-    int i = 0;
+    size_t i = 0;
 
     if (_buff[0] != ':')
         _prefix = "";
@@ -50,7 +50,7 @@ void MessageProtocol::makePrefix()
 
 void MessageProtocol::makeCommand()
 {
-    int i = 0;
+    size_t i = 0;
 
     while (i != _buff.size())
     {
@@ -69,7 +69,7 @@ void MessageProtocol::makeParams()
     if (_buff.size() == 0 || _buff[0] != ' ')
         throw (std::runtime_error("클라이언트 메세지 형식 err"));
     
-    for (int i = 0; i < _buff.size(); i++)
+    for (size_t i = 0; i < _buff.size(); i++)
     {
         if (_buff[i] == ' ')
             continue ;

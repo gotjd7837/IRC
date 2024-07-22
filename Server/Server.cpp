@@ -1,12 +1,12 @@
 #include "Server.hpp"
-#include "Client.hpp"
-#include "MessageProtocol.hpp"
+#include "../Client/Client.hpp"
+#include "../MessageProtocol/MessageProtocol.hpp"
 
 bool Server::_signal = false;
 
 Server::Server() : _serverSocket(-1) {}
 
-Server::Server(std::string port, std::string password) : _password(password), _port(port), _serverSocket(-1) {}
+Server::Server(std::string port, std::string password) : _serverSocket(-1), _password(password), _port(port) {}
 
 Server::~Server()
 {
@@ -33,7 +33,7 @@ void Server::removeClient(int clientFd)
     delete _clients[clientFd];
     _clients.erase(clientFd);
 
-    for (int i = 0; i < _pollFds.size(); i++)
+    for (size_t i = 0; i < _pollFds.size(); i++)
     {
         if (_pollFds[i].fd == clientFd)
         {
@@ -108,6 +108,7 @@ void Server::serverSocket()
 // command 처리 인터페이스
 void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
 {
+    (void)clientFd;
     std::cout << "prefix : " << parsedMessage.getPrefix() << std::endl;
     std::cout << "command : " << parsedMessage.getCommand() << std::endl;
     for (size_t i = 0; i < parsedMessage.getParams().size(); i++)
@@ -191,7 +192,7 @@ void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
 {
     std::string tmp;
     
-    for (int i = 0; i < combinedMessage.size(); i++)
+    for (size_t i = 0; i < combinedMessage.size(); i++)
     {
         tmp += combinedMessage[i];
         if (1 < tmp.size() && tmp[tmp.size() - 1] == '\n' && tmp[tmp.size() - 2] == '\r') // cr-lf가 있는 완전한 메세지는 excuteCommand로 전달
@@ -225,7 +226,7 @@ void Server::handleClientRequest(int targetFd)
 
 void Server::handleEvent()
 {
-    for (int i = 0; i < _pollFds.size(); i++)
+    for (size_t i = 0; i < _pollFds.size(); i++)
     {
         if (_pollFds[i].revents & POLLIN)
         {

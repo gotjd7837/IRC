@@ -54,9 +54,9 @@ class Server
         void handleCombinedMessage(std::string combinedMessage, int clientFd);
 
         // command
-        void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd);
-        void Server::cmdPass(MessageProtocol& parsedMessage, int clientFd);
-        void Server::cmdUser(MessageProtocol& parsedMessage, int clientFd);
+        void excuteCommand(MessageProtocol parsedMessage, int clientFd);
+        void cmdPass(MessageProtocol& parsedMessage, int clientFd);
+        void cmdUser(MessageProtocol& parsedMessage, int clientFd);
 };
 
 
