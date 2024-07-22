@@ -25,6 +25,7 @@ class MessageProtocol;
 class Server
 {
     private :
+        std::string _name;
         int _serverSocket;
         static bool _signal;
         std::string _password;
@@ -57,6 +58,8 @@ class Server
         void excuteCommand(MessageProtocol parsedMessage, int clientFd);
         void cmdPass(MessageProtocol& parsedMessage, int clientFd);
         void cmdUser(MessageProtocol& parsedMessage, int clientFd);
+        void codeMsgReply(int clientFd, int code);
+        void sendMsg(int clientFd, char *code, std::string nick, char *msg);
 };
 
 

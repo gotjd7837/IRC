@@ -1,6 +1,12 @@
 #include "Client.hpp"
 
-Client::Client() : _fd(-1) {}
+Client::Client() : 
+_fd(-1), 
+_nickname(""), 
+_username(""), 
+_realname(""), 
+_password(""), 
+_cert(false) {}
 
 int Client::getfd()
 {

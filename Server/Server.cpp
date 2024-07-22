@@ -240,6 +240,7 @@ void Server::handleEvent()
 
 void Server::serverInit()
 {
+    _name = std::string("ircserv");
     serverSocket();
 
     std::cout << GRE << "Server <" << _serverSocket << "> Connected" << WHI << std::endl;
@@ -248,7 +249,7 @@ void Server::serverInit()
     while (_signal == false)
     {
         if((poll(&_pollFds[0], _pollFds.size(), -1) == -1) && _signal == false) //-> wait for an event
-			throw(std::runtime_error("poll() faild"));
+			throw(std::runtime_error("poll() failed"));
         handleEvent();
     }
 }

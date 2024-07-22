@@ -16,10 +16,12 @@ class Client
 {
     private :
         int _fd;
+        bool _cert;
         std::string _ipadd;
         std::string _nickname;
         std::string _username;
         std::string _realname;
+        std::string _password;
         // std::string _host;
         std::string _messageBuff;
     
