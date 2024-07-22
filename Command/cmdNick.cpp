@@ -5,15 +5,23 @@
 void Server::cmdNick(MessageProtocol& parsedMessage, int clientFd)
 {
     Client* cli = _clients[clientFd];
+    std::string oldNick = cli->getNick();
 
-    if (!cli->_cert)
+    if (!cli->getCert())
         clientCert(clientFd);
-    if (!cli->_cert)
+    if (!cli->getCert())
         return ;
-    for (std::map<int, Client *>::iterator it = _client.begin(); it != _client.end(); it++)
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++)
     {
-        
+        std::string nickname = it->second->getNick();
+        if (nickname == parsedMessage.getParams()[0])
+        {
+            codeMsgReply(clientFd, 407);
+            return ;
+        }
     }
-    
-    
+    cli->setNick(parsedMessage.getParams()[0]);
+
+    if (oldNick != "")
+        bcastMsg(":" + oldNick + " NICK " + parsedMessage.getParams()[0] + "\r\n");
 }

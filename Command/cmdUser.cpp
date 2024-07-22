@@ -6,10 +6,18 @@ void Server::cmdUser(MessageProtocol& parsedMessage, int clientFd)
 {
     Client* cli = _clients[clientFd];
 
-    if (!cli->_cert)
+    if (!cli->getCert())
         clientCert(clientFd);
-    if (!cli->_cert)
+    if (!cli->getCert())
         return ;
-    
-    
+    if (cli->getNick() == "")
+    {
+        codeMsgReply(clientFd, 461);
+        return ;
+    }
+
+    cli->setUser(parsedMessage.getParams()[0]);
+
+    std::string welcomeMessage = "001 " + cli->getNick() + " :Welcome to the Internet Relay Network " + cli->getNick() + "\r\n";
+    send(clientFd, welcomeMessage.c_str(), welcomeMessage.length(), 0);
 }

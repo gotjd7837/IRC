@@ -2,25 +2,66 @@
 
 Client::Client() : 
 _fd(-1), 
+_cert(false),
+_ipaddr(""),
 _nickname(""), 
 _username(""), 
 _realname(""), 
-_password(""), 
-_cert(false) {}
+_password("")  {}
 
-int Client::getfd()
+int Client::getFd()
 {
-    return _fd;
+    return (_fd);
 }
 
-void Client::setfd(int fd)
+bool Client::getCert()
+{
+    return (_cert);
+}
+
+std::string Client::getPass()
+{
+    return (_password);
+}
+
+std::string Client::getNick()
+{
+    return (_nickname);
+}
+
+std::string Client::getUser()
+{
+    return (_username);
+}
+
+void Client::setNick(std::string nick)
+{
+    _nickname = nick;
+}
+
+void Client::setUser(std::string user)
+{
+    _username = user;
+}
+
+void Client::setPass(std::string pass)
+{
+    _password = pass;
+}
+
+void Client::setCert(bool cert)
+{
+    _cert = cert;
+}
+
+void Client::setFd(int fd)
 {
     _fd = fd;
 }
 
-void Client::setipadd(std::string ipadd) 
+void Client::setIpaddr(std::string ipaddr) 
 {
-    _ipadd = ipadd;
+    _ipaddr = ipaddr;
 }
 
 std::string Client::popMessageBuff()
@@ -36,11 +77,11 @@ void Client::pushMessageBuff(std::string& message)
     _messageBuff += message;
 }
 
-void Client::reply(std::string message)
-{
-    std::string prefix = _nickname + "!" + _username + "@" + _ipadd + " ";
-    message = ":" + prefix + message + "\r\n";
+// void Client::reply(std::string message)
+// {
+//     std::string prefix = _nickname + "!" + _username + "@" + _ipadd + " ";
+//     message = ":" + prefix + message + "\r\n";
 
-    if (send(_fd, message.c_str(), message.size(), 0) < 0)
-        throw(std::runtime_error("send() failed"));
-}
+//     if (send(_fd, message.c_str(), message.size(), 0) < 0)
+//         throw(std::runtime_error("send() failed"));
+// }

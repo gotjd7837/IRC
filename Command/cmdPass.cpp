@@ -8,8 +8,8 @@ void Server::cmdPass(MessageProtocol& parsedMessage, int clientFd)
 
     if (parsedMessage.getParams().empty())
         codeMsgReply(clientFd, 461);
-    if (cli->_cert)
+    if (cli->getCert())
         codeMsgReply(clientFd, 462);
 
-    cli->_password = parsedMessage.getParams()[0];
+    cli->setPass(parsedMessage.getParams()[0]);
 }

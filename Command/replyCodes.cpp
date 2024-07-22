@@ -39,13 +39,13 @@
 
 void Server::sendMsg(int clientFd, char *code, std::string nick, char *msg)
 {
-    if (send(clientFd, std::string(":", _name, " ", code, " ", nick, " ", msg , "\n")) < 0)
-        throw(std::runtime_error("send() failed"));
+    // if (send(clientFd, std::string(":", _name, " ", code, " ", nick, " ", msg , "\n")) < 0)
+    //     throw(std::runtime_error("send() failed"));
 }
 
 void Server::codeMsgReply(int clientFd, int code)
 {
-    std::string nick = _clients[clientFd]->_nickname;
+    std::string nick = _clients[clientFd]->getNick();
 
     if (code == 401) sendMsg(clientFd, "401", nick, ERR_NOSUCHNICK);
     if (code == 402) sendMsg(clientFd, "402", nick, ERR_NOSUCHSERVER);

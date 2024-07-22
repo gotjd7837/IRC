@@ -6,9 +6,9 @@ void Server::clientCert(int clientFd)
 {
     Client* cli = _clients[clientFd];
 
-    if (cli->_password == this->_password)
-        cli->_cert = true;
-    else if (cli->_password == "")
+    if (cli->getPass() == this->_password)
+        cli->setCert(true);
+    else if (cli->getPass() == "")
     {
         codeMsgReply(clientFd, 461);
         removeClient(clientFd);
