@@ -61,13 +61,14 @@ class Server
         void cmdPass(MessageProtocol& parsedMessage, int clientFd);
         void cmdUser(MessageProtocol& parsedMessage, int clientFd);
         void cmdNick(MessageProtocol& parsedMessage, int clientFd);
+        void cmdPong(MessageProtocol& parsedMessage, int clientFd)
 
         void clientCert(int clientFd);
 
         void codeMsgReply(int clientFd, int code);
         void sendMsg(int clientFd, char *code, std::string nick, char *msg);
         void bcastMsg(std::string msg);
-        void ucastMsg(int clientFd, std::string msg)
+        void ucastMsg(int clientFd, std::string msg);
 };
 
 

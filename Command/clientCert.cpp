@@ -4,7 +4,9 @@
 
 void Server::clientCert(int clientFd)
 {
-    Client* cli = _clients[clientFd];
+    Client* cli = getClient(clientFd);
+    if (cli == nullptr)
+        return ;
 
     if (cli->getPass() == this->_password)
         cli->setCert(true);

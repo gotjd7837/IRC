@@ -22,6 +22,8 @@ void Server::signalHandler(int signal)
 
 Client* Server::getClient(int clientFd)
 {
+    if (_clients.find(clientFd) == _clients.end())
+        return (nullptr);
     return (_clients[clientFd]);
 }
 
@@ -212,7 +214,8 @@ void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
         }
     }
     // cr-lf가 없는 message는 client 객체 _messageBuff에 저장
-    getClient(clientFd)->pushMessageBuff(tmp);
+    if (getClient(clientFd) != nullptr)
+        getClient(clientFd)->pushMessageBuff(tmp);
     return ;
 }
 

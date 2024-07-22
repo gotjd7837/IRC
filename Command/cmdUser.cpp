@@ -4,7 +4,9 @@
 
 void Server::cmdUser(MessageProtocol& parsedMessage, int clientFd)
 {
-    Client* cli = _clients[clientFd];
+    Client* cli = getClient(clientFd);
+    if (cli == nullptr)
+        return ;
 
     if (!cli->getCert())
         clientCert(clientFd);

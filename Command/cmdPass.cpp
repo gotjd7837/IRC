@@ -4,7 +4,9 @@
 
 void Server::cmdPass(MessageProtocol& parsedMessage, int clientFd)
 {
-    Client* cli = _clients[clientFd];
+    Client* cli = getClient(clientFd);
+    if (cli == nullptr)
+        return ;
 
     if (parsedMessage.getParams().empty())
         codeMsgReply(clientFd, 461);
