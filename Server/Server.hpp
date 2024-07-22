@@ -20,19 +20,20 @@
 #define SERVER_PORT 6667
 
 class Client;
+class Channel;
 class MessageProtocol;
 
 class Server
 {
     private :
         std::string _name;
-
         
         int _serverSocket;
         static bool _signal;
         std::string _password;
         std::string _port;
 
+        std::map<std::string, Channel *> _channels;
         std::map<int, Client *> _clients;
         std::vector<struct pollfd> _pollFds;
 
@@ -62,6 +63,7 @@ class Server
         void cmdUser(MessageProtocol& parsedMessage, int clientFd);
         void cmdNick(MessageProtocol& parsedMessage, int clientFd);
         void cmdPong(MessageProtocol& parsedMessage, int clientFd);
+        void cmdJoin(MessageProtocol& parsedMessage, int clientFd);
 
         void clientCert(int clientFd);
 

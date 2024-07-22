@@ -32,6 +32,10 @@ void Server::removeClient(int clientFd)
 {
     std::cout << "disconnect [" << clientFd << "] Client" << "\n";
 
+    // for (channel)
+    //     {
+    //         channaliter->removemember(_clients[clientFd])
+    //     }
     delete _clients[clientFd];
     _clients.erase(clientFd);
 
