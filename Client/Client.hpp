@@ -16,19 +16,29 @@ class Client
 {
     private :
         int _fd;
-        std::string _ipadd;
+        bool _cert;
+        std::string _ipaddr;
         std::string _nickname;
         std::string _username;
         std::string _realname;
+        std::string _password;
         // std::string _host;
         std::string _messageBuff;
     
     public :
         Client();
-        int getfd();
+        int getFd();
+        bool getCert();
+        std::string getPass();
+        std::string getNick();
+        std::string getUser();
 
-        void setfd(int fd);
-        void setipadd(std::string ipadd);
+        void setUser(std::string user);
+        void setNick(std::string nick);
+        void setPass(std::string pass);
+        void setCert(bool cert);
+        void setFd(int fd);
+        void setIpaddr(std::string ipaddr);
 
         std::string popMessageBuff();
         void pushMessageBuff(std::string& message);

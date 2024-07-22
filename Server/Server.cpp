@@ -22,6 +22,8 @@ void Server::signalHandler(int signal)
 
 Client* Server::getClient(int clientFd)
 {
+    if (_clients.find(clientFd) == _clients.end())
+        return (nullptr);
     return (_clients[clientFd]);
 }
 
@@ -30,6 +32,10 @@ void Server::removeClient(int clientFd)
 {
     std::cout << "disconnect [" << clientFd << "] Client" << "\n";
 
+    // for (channel)
+    //     {
+    //         channaliter->removemember(_clients[clientFd])
+    //     }
     delete _clients[clientFd];
     _clients.erase(clientFd);
 
@@ -41,6 +47,8 @@ void Server::removeClient(int clientFd)
             break ;
         }
     }
+    
+    close(clientFd);
 }
 
 void Server::addClient()
@@ -63,8 +71,8 @@ void Server::addClient()
     new_poll.revents = 0; //-> set the revents to 0
     _pollFds.push_back(new_poll); //-> add the new client socket to the pollfd
 
-    cli->setfd(new_fd);
-    cli->setipadd(inet_ntoa(add.sin_addr));
+    cli->setFd(new_fd);
+    cli->setIpaddr(inet_ntoa(add.sin_addr));
     _clients[new_fd] = cli;
     
     std::cout << GRE << "Client <" << new_fd << "> Connected" << WHI << std::endl;
@@ -113,6 +121,17 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
     std::cout << "command : " << parsedMessage.getCommand() << std::endl;
     for (size_t i = 0; i < parsedMessage.getParams().size(); i++)
         std::cout << "params : " << parsedMessage.getParams()[i] << std::endl;
+
+    if (parsedMessage.getCommand() == "PASS")
+        cmdPass(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "NICK")
+        cmdNick(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "USER")
+        cmdUser(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "PING")
+        cmdPong(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "JOIN")
+        cmdJoin(parsedMessage, clientFd);
 
 
     // std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
@@ -203,7 +222,8 @@ void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
         }
     }
     // cr-lf가 없는 message는 client 객체 _messageBuff에 저장
-    getClient(clientFd)->pushMessageBuff(tmp);
+    if (getClient(clientFd) != nullptr)
+        getClient(clientFd)->pushMessageBuff(tmp);
     return ;
 }
 
@@ -240,6 +260,8 @@ void Server::handleEvent()
 
 void Server::serverInit()
 {
+    _name = std::string("ircserv");
+    _password = std::string("1234");
     serverSocket();
 
     std::cout << GRE << "Server <" << _serverSocket << "> Connected" << WHI << std::endl;
@@ -248,7 +270,7 @@ void Server::serverInit()
     while (_signal == false)
     {
         if((poll(&_pollFds[0], _pollFds.size(), -1) == -1) && _signal == false) //-> wait for an event
-			throw(std::runtime_error("poll() faild"));
+			throw(std::runtime_error("poll() failed"));
         handleEvent();
     }
 }

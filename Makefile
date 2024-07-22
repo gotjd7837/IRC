@@ -2,12 +2,14 @@ NAME = ircserv
 
 CC = c++
 
-FLAGS = -g -Werror -Wall -Wextra -std=c++98
+FLAGS = #-g -Werror -Wall -Wextra -std=c++98
 
 SOURCE = main.cpp \
 		Server/Server.cpp \
 		Client/Client.cpp \
-		MessageProtocol/MessageProtocol.cpp
+		MessageProtocol/MessageProtocol.cpp \
+		Command/*.cpp \
+		Channel/Channel.cpp
 
 $(NAME): $(SOURCE)
 	$(CC) $(FLAGS) $(SOURCE) -o $(NAME)

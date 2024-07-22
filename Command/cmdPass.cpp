@@ -1,8 +1,18 @@
 #include "../Server/Server.hpp"
 #include "../Client/Client.hpp"
 #include "../MessageProtocol/MessageProtocol.hpp"
+#include "../Channel/Channel.hpp"
 
 void Server::cmdPass(MessageProtocol& parsedMessage, int clientFd)
 {
-    std::string pass = parsedMessage.getParams()[0]; 
+    Client* cli = getClient(clientFd);
+    if (cli == nullptr)
+        return ;
+
+    if (parsedMessage.getParams().empty())
+        codeMsgReply(clientFd, 461);
+    if (cli->getCert())
+        codeMsgReply(clientFd, 462);
+
+    cli->setPass(parsedMessage.getParams()[0]);
 }
