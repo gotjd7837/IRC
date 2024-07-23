@@ -64,6 +64,7 @@ class Server
         void cmdNick(MessageProtocol& parsedMessage, int clientFd);
         void cmdPong(MessageProtocol& parsedMessage, int clientFd);
         void cmdJoin(MessageProtocol& parsedMessage, int clientFd);
+        void cmdPart(MessageProtocol& parsedMessage, int clientFd);
 
         void clientCert(int clientFd);
 
