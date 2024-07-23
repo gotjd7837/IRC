@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "../Client/Client.hpp"
 #include "../MessageProtocol/MessageProtocol.hpp"
+#include "../Channel/Channel.hpp"
 
 bool Server::_signal = false;
 
@@ -78,6 +79,24 @@ void Server::addClient()
     std::cout << GRE << "Client <" << new_fd << "> Connected" << WHI << std::endl;
 }
 
+Channel* Server::getChannel(std::string channelName)
+{
+    if (_channels.find(channelName) == _channels.end())
+        return (nullptr);
+    return (_channels[channelName]);
+}
+
+void Server::removeChannel(std::string channelName)
+{
+    delete _channels[channelName];
+    _channels.erase(channelName);
+}
+
+void Server::addChannel(std::string channelName)
+{
+    _channels[channelName] = new Channel(channelName);
+}
+
 void Server::serverSocket()
 {
     struct sockaddr_in add;
@@ -134,7 +153,6 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         cmdJoin(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "PRIVMSG")
         cmdPrivMsg(parsedMessage, clientFd);
-
 
     // std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
 
