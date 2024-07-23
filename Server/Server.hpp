@@ -73,6 +73,7 @@ class Server
         void cmdKick(MessageProtocol& parsedMessage, int clientFd);
         void cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd);
         void cmdMode(MessageProtocol& parsedMessage, int clientFd);
+        void cmdOper(MessageProtocol& parsedMessage, int clientFd);
 
         void clientCert(int clientFd);
 

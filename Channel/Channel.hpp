@@ -42,10 +42,6 @@ public:
     const std::string& getTopic() const;
     void setTopic(const std::string& topic);
 
-    // Getter and Setter for _modes
-    const std::string& getModes() const;
-    void setModes(const std::string& modes);
-
     // Getter and Setter for _members
     const std::map<Client*, bool>& getMembers() const;
     void setMembers(const std::map<Client*, bool>& members);
