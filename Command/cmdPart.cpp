@@ -33,14 +33,13 @@ void Server::cmdPart(MessageProtocol& parsedMessage, int clientFd)
     _channels[channelName]->removeMember(cli);
     if (parsedMessage.getParams().size() > 1)
     {
-        ucastMsg(clientFd, std::string(":" + cli->getNick() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
-        ccastMsg(channelName, std::string(":" + cli->getNick() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
+        ucastMsg(clientFd, std::string(":" + cli->getPrefix() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
+        ccastMsg(channelName, std::string(":" + cli->getPrefix() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
     }
     else
     {
-        ucastMsg(clientFd, std::string(":" + cli->getNick() + " PART " + channelName));
-        ccastMsg(channelName, std::string(":" + cli->getNick() + " PART " + channelName));
+        ucastMsg(clientFd, std::string(":" + cli->getPrefix() + " PART " + channelName));
+        ccastMsg(channelName, std::string(":" + cli->getPrefix() + " PART " + channelName));
+        ucastMsg(clientFd, std::string("442 " + cli->getNick() + " " + channelName + " :You're not on that channel"));
     }
-    
-
 }
