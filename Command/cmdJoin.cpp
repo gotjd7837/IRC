@@ -67,8 +67,7 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
                 users += "@";
             users += cli->getNick();
             ucastMsg(clientFd, std::string("353 " + cli->getNick() + " = " + targetChannel + " :" + users));
-    
-            ucastMsg(clientFd, std::string("366 " + targetChannel + " :" + "End of /NAMES list"));
+            ucastMsg(clientFd, std::string("366 " + cli->getNick() + " " + targetChannel + " :" + "End of /NAMES list"));
         }
         else
             codeMsgReply(clientFd, 475);
