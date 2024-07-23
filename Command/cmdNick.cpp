@@ -28,5 +28,5 @@ void Server::cmdNick(MessageProtocol& parsedMessage, int clientFd)
     cli->setNick(parsedMessage.getParams()[0]);
 
     if (oldNick != "")
-        bcastMsg(":" + oldNick + " NICK " + parsedMessage.getParams()[0]);
+        bcastMsg(":" + oldNick + " NICK " + ":" + parsedMessage.getParams()[0]);
 }
