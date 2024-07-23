@@ -57,7 +57,7 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
                     users += "@";
                 users += it->first->getNick() + " ";
 
-                ucastMsg(it->first->getFd(), std::string(":" + cli->getNick() + "JOIN " + targetChannel));
+                ucastMsg(it->first->getFd(), std::string(":" + cli->getNick() + " JOIN " + targetChannel));
             }
 
             channel->addMember(cli, op);
