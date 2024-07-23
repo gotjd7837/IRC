@@ -55,7 +55,7 @@ public:
 
     void addMode(unsigned int mode);
     void removeMode(unsigned int mode);
-    bool isMode(unsigned int mode);
+    bool hasMode(unsigned int mode);
 };
 
 #endif

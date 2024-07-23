@@ -84,7 +84,7 @@ void Channel::removeMode(unsigned int mode)
 {
     _modes &= ~mode;
 }
-bool Channel::isMode(unsigned int mode)
+bool Channel::hasMode(unsigned int mode)
 {
     return (_modes & mode);
 }
