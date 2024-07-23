@@ -51,6 +51,10 @@ class Server
         Client* getClient(int clientFd);
         void removeClient(int clientFd);
 
+        Channel* getChannel(std::string channelName);
+        void removeChannel(std::string channelName);
+        void addChannel(std::string channelName);
+
         void handleEvent();
         void handleClientRequest(int targetFd);
         std::string recvClientMessage(int clientFd);
@@ -65,6 +69,7 @@ class Server
         void cmdPong(MessageProtocol& parsedMessage, int clientFd);
         void cmdJoin(MessageProtocol& parsedMessage, int clientFd);
         void cmdPart(MessageProtocol& parsedMessage, int clientFd);
+        void cmdKick(MessageProtocol& parsedMessage, int clientFd);
 
         void clientCert(int clientFd);
 
@@ -72,6 +77,7 @@ class Server
         void sendMsg(int clientFd, char *code, std::string nick, char *msg);
         void bcastMsg(std::string msg);
         void ucastMsg(int clientFd, std::string msg);
+        void ccastMsg(std::string channelName, std::string msg);
 };
 
 

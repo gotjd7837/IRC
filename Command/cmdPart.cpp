@@ -14,6 +14,7 @@
 ** 6. 채널에 속해있는 클라이언트에게 채널에서 나갔다는 메시지를 전송한다.
 ** 6-1. part의 메세지가 있을 경우 해당 메세지를 전송한다.
 ** 6-2. part의 메세지가 없을 경우 채널에서 나갔다는 메세지를 전송한다.
+** 7. 채널에 아무도 없을 경우 채널을 삭제한다.
 */
 
 void Server::cmdPart(MessageProtocol& parsedMessage, int clientFd)
@@ -33,14 +34,13 @@ void Server::cmdPart(MessageProtocol& parsedMessage, int clientFd)
     if (parsedMessage.getParams().size() > 1)
     {
         ucastMsg(clientFd, std::string(":" + cli->getNick() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
-        for (std::map<Client*, bool>::const_iterator it = _channels[channelName]->getMembers().begin(); it != _channels[channelName]->getMembers().end(); it++)
-            ucastMsg(it->first->getFd(), std::string(":" + cli->getNick() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
+        ccastMsg(channelName, std::string(":" + cli->getNick() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
     }
     else
     {
         ucastMsg(clientFd, std::string(":" + cli->getNick() + " PART " + channelName));
-        for (std::map<Client*, bool>::const_iterator it = _channels[channelName]->getMembers().begin(); it != _channels[channelName]->getMembers().end(); it++)
-            ucastMsg(it->first->getFd(), std::string(":" + cli->getNick() + " PART " + channelName));
+        ccastMsg(channelName, std::string(":" + cli->getNick() + " PART " + channelName));
     }
+    
 
 }

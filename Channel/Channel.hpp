@@ -42,6 +42,8 @@ public:
     void addMember(Client* client, bool status);
     void removeMember(Client* client);
     bool isMember(Client* client) const;
+    bool isOper(Client* client) const;
+    Client* searchMemberNick(const std::string& nick) const;
 };
 
 #endif
