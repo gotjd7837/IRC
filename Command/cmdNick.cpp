@@ -9,6 +9,11 @@ void Server::cmdNick(MessageProtocol& parsedMessage, int clientFd)
     if (cli == nullptr)
         return ;
     
+    if (!cli->getCert())
+        clientCert(clientFd);
+    if (!cli->getCert())
+        return ;
+
     std::string oldNick = cli->getNick();
 
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++)
@@ -23,5 +28,5 @@ void Server::cmdNick(MessageProtocol& parsedMessage, int clientFd)
     cli->setNick(parsedMessage.getParams()[0]);
 
     if (oldNick != "")
-        bcastMsg(":" + oldNick + " NICK " + parsedMessage.getParams()[0] + "\r\n");
+        bcastMsg(":" + oldNick + " NICK " + ":" + parsedMessage.getParams()[0]);
 }

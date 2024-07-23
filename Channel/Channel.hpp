@@ -5,6 +5,18 @@
 # include <vector>
 # include <map>
 
+# define MODE_O 0x1
+# define MODE_P 0x2
+# define MODE_S 0x4
+# define MODE_I 0x8
+# define MODE_T 0x10
+# define MODE_N 0x20
+# define MODE_M 0x40
+# define MODE_L 0x80
+# define MODE_B 0x100
+# define MODE_V 0x200
+# define MODE_K 0x400
+
 class Client;
 
 class Channel
@@ -12,8 +24,8 @@ class Channel
 private:
     std::string _name;
     std::string _topic;
-    std::string _modes;
     std::string _key;
+    unsigned int _modes;
     std::map<Client*, bool> _members;
 
 public:
@@ -44,6 +56,10 @@ public:
     bool isMember(Client* client) const;
     bool isOper(Client* client) const;
     Client* searchMemberNick(const std::string& nick) const;
+
+    void addMode(unsigned int mode);
+    void removeMode(unsigned int mode);
+    bool isMode(unsigned int mode);
 };
 
 #endif

@@ -57,7 +57,7 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
                     users += "@";
                 users += it->first->getNick() + " ";
 
-                ucastMsg(it->first->getFd(), std::string(":" + cli->getNick() + "JOIN " + targetChannel));
+                ucastMsg(it->first->getFd(), std::string(":" + cli->getNick() + " JOIN " + targetChannel));
             }
 
             channel->addMember(cli, op);
@@ -66,9 +66,8 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
             if (op)
                 users += "@";
             users += cli->getNick();
-            ucastMsg(clientFd, std::string("353 " + targetChannel + " :" + users));
-    
-            ucastMsg(clientFd, std::string("366 " + targetChannel + " :" + "End of /NAMES list"));
+            ucastMsg(clientFd, std::string("353 " + cli->getNick() + " = " + targetChannel + " :" + users));
+            ucastMsg(clientFd, std::string("366 " + cli->getNick() + " " + targetChannel + " :" + "End of /NAMES list"));
         }
         else
             codeMsgReply(clientFd, 475);

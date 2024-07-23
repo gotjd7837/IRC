@@ -16,11 +16,12 @@ void Server::cmdUser(MessageProtocol& parsedMessage, int clientFd)
     if (cli->getNick() == "")
     {
         codeMsgReply(clientFd, 461);
+        removeClient(clientFd);
         return ;
     }
 
     cli->setUser(parsedMessage.getParams()[0]);
 
     std::string welcomeMessage = "001 " + cli->getNick() + " :Welcome to the Internet Relay Network " + cli->getNick() + "\r\n";
-    bcastMsg(welcomeMessage);
+    ucastMsg(clientFd, welcomeMessage);
 }

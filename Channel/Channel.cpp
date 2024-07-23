@@ -1,7 +1,7 @@
 #include "Channel.hpp"
 #include "../Client/Client.hpp"
 
-Channel::Channel(std::string name, std::string key) : _name(name), _key(key) {}
+Channel::Channel(std::string name, std::string key) : _name(name), _key(key), _modes(0x0) {}
 // Getter and Setter for _name
 const std::string& Channel::getName() const 
 {
@@ -85,4 +85,17 @@ Client* Channel::searchMemberNick(const std::string& nick) const
             return (it->first);
     }
     return (nullptr);
+}
+
+void Channel::addMode(unsigned int mode)
+{
+    _modes |= mode;
+}
+void Channel::removeMode(unsigned int mode)
+{
+    _modes &= ~mode;
+}
+bool Channel::isMode(unsigned int mode)
+{
+    return (_modes & mode);
 }
