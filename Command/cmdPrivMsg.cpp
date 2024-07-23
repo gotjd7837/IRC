@@ -50,7 +50,11 @@ void Server::cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd)
                 {
                     std::map<Client*, bool>members = chait->second->getMembers();
                     for (std::map<Client*, bool>::iterator memit = members.begin(); memit != members.end(); memit++)
+                    {
+                        if (memit->first->getNick() == cli->getNick())
+                            continue ;
                         ucastMsg(memit->first->getFd(), ":" + cli->getNick() + " PRIVMSG " + (*it) + " " + parsedMessage.getParams()[1]);
+                    }
                     break ;
                 }
             }
