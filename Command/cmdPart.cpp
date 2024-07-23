@@ -40,7 +40,6 @@ void Server::cmdPart(MessageProtocol& parsedMessage, int clientFd)
     {
         ucastMsg(clientFd, std::string(":" + cli->getPrefix() + " PART " + channelName));
         ccastMsg(channelName, std::string(":" + cli->getPrefix() + " PART " + channelName));
+        ucastMsg(clientFd, std::string("442 " + cli->getNick() + " " + channelName + " :You're not on that channel"));
     }
-    
-
 }

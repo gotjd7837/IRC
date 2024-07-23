@@ -8,15 +8,15 @@ static unsigned int modeFlag(char c)
     switch(c)
     {
         case 'o': return (MODE_O);
-        case 'p': return (MODE_P);
-        case 's': return (MODE_S);
+        //case 'p': return (MODE_P);
+        //case 's': return (MODE_S);
         case 'i': return (MODE_I);
         case 't': return (MODE_T);
-        case 'n': return (MODE_N);
-        case 'm': return (MODE_M);
+        //case 'n': return (MODE_N);
+        //case 'm': return (MODE_M);
         case 'l': return (MODE_L);
-        case 'b': return (MODE_B);
-        case 'v': return (MODE_V);
+        //case 'b': return (MODE_B);
+        //case 'v': return (MODE_V);
         case 'k': return (MODE_K);
         default: return (0);  // 정의되지 않은 문자의 경우 0 반환
     }
