@@ -132,6 +132,8 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         cmdPong(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "JOIN")
         cmdJoin(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "PRIVMSG")
+        cmdPrivMsg(parsedMessage, clientFd);
 
 
     // std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
