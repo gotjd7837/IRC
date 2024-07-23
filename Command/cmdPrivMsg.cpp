@@ -44,19 +44,24 @@ void Server::cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd)
         }
         else // to channel
         {
-            for (std::map<std::string, Channel*>::iterator chait = _channels.begin(); chait != _channels.end(); chait++)
+            std::map<std::string, Channel*>::iterator chait = _channels.find(*it);
+            if (chait == _channels.end())
+                ucastMsg(clientFd, std::string("403 " + cli->getNick() + " " + chait->first + " :No such channel"));
+            else
             {
-                if (chait->first == (*it))
+                if (!chait->second->isMember(cli))
                 {
-                    std::map<Client*, bool>members = chait->second->getMembers();
-                    for (std::map<Client*, bool>::iterator memit = members.begin(); memit != members.end(); memit++)
-                    {
-                        if (memit->first->getNick() == cli->getNick())
-                            continue ;
-                        ucastMsg(memit->first->getFd(), ":" + cli->getNick() + " PRIVMSG " + (*it) + " " + parsedMessage.getParams()[1]);
-                    }
-                    break ;
+                    ucastMsg(clientFd, std::string("442 " + cli->getNick() + " " + chait->first + " :You're not on that channel"));
+                    return ;
                 }
+                std::map<Client*, bool>members = chait->second->getMembers();
+                for (std::map<Client*, bool>::iterator memit = members.begin(); memit != members.end(); memit++)
+                {
+                    if (memit->first->getNick() == cli->getNick())
+                        continue ;
+                    ucastMsg(memit->first->getFd(), ":" + cli->getNick() + " PRIVMSG " + (*it) + " " + parsedMessage.getParams()[1]);
+                }
+                break ;
             }
         }
     }

@@ -7,17 +7,17 @@ static unsigned int modeFlag(char c)
 {
     switch(c)
     {
-        case 'O': return (MODE_O);
-        case 'P': return (MODE_P);
-        case 'S': return (MODE_S);
-        case 'I': return (MODE_I);
-        case 'T': return (MODE_T);
-        case 'N': return (MODE_N);
-        case 'M': return (MODE_M);
-        case 'L': return (MODE_L);
-        case 'B': return (MODE_B);
-        case 'V': return (MODE_V);
-        case 'K': return (MODE_K);
+        case 'o': return (MODE_O);
+        case 'p': return (MODE_P);
+        case 's': return (MODE_S);
+        case 'i': return (MODE_I);
+        case 't': return (MODE_T);
+        case 'n': return (MODE_N);
+        case 'm': return (MODE_M);
+        case 'l': return (MODE_L);
+        case 'b': return (MODE_B);
+        case 'v': return (MODE_V);
+        case 'k': return (MODE_K);
         default: return (0);  // 정의되지 않은 문자의 경우 0 반환
     }
 }
@@ -27,6 +27,8 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
     Client* cli = getClient(clientFd);
     Channel* cha = getChannel(parsedMessage.getParams()[0]);
 
+    if (cha == NULL)
+        return ;
     unsigned int add = 0, remove = 0;
 
     std::string tmp = parsedMessage.getParams()[1];
@@ -40,4 +42,6 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
 
     cha->addMode(add);
     cha->removeMode(remove);
+
+    ccastMsg(cha->getName(), std::string("324 " + cli->getNick() + " " + cha->getName() + " " + cha->getMode()));
 }   

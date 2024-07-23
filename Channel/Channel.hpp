@@ -55,7 +55,8 @@ public:
 
     void addMode(unsigned int mode);
     void removeMode(unsigned int mode);
-    bool hasMode(unsigned int mode);
+    bool hasMode(unsigned int mode) const;
+    std::string getMode() const;
 };
 
 #endif
