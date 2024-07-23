@@ -22,7 +22,7 @@ void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
 {
     if (parsedMessage.getParams().size() < 2)
     {
-        codeMsgReply(clientFd, 461);
+        ucastMsg(clientFd, std::string("461 " + getClient(clientFd)->getNick() + " KICK :Not enough parameters"));
         return ;
     }
 
@@ -31,12 +31,12 @@ void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
     Channel* channel = getChannel(channelName);
     if (channel == nullptr)
     {
-        codeMsgReply(clientFd, 403);
+        ucastMsg(clientFd, std::string("403 " + client->getNick() + " " + channelName + " :No such channel"));
         return ;
     }
     if (channel->isOper(client) == false)
     {
-        codeMsgReply(clientFd, 482);
+        ucastMsg(clientFd, std::string("482 " + client->getNick() + " :You're not channel operator"));
         return ;
     }
 
@@ -44,10 +44,10 @@ void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
     Client* targetClient = channel->searchMemberNick(targetNick);
     if (targetClient == nullptr)
     {
-        codeMsgReply(clientFd, 441);
+        ucastMsg(clientFd, std::string("441 " + client->getNick() + " " + targetNick + " :They aren't on that channel"));
         return ;
     }
 
-    ccastMsg(channelName, std::string(":" + client->getNick() + " KICK " + channelName + " " + targetNick + " " + parsedMessage.getParams()[2]));
+    ccastMsg(channelName, std::string("KICK " + channelName + " " + targetNick + " " + parsedMessage.getParams()[2]));
     channel->removeMember(targetClient);
 }

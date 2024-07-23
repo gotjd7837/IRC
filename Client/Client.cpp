@@ -77,6 +77,11 @@ void Client::pushMessageBuff(std::string& message)
     _messageBuff += message;
 }
 
+std::string Client::getPrefix()
+{
+    return (":" + _nickname + "!" + _username + "@" + _ipaddr);
+}
+
 // void Client::reply(std::string message)
 // {
 //     std::string prefix = _nickname + "!" + _username + "@" + _ipadd + " ";

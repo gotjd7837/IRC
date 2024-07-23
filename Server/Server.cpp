@@ -153,6 +153,16 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         cmdJoin(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "PRIVMSG")
         cmdPrivMsg(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "MODE")
+        cmdMode(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "OPER")
+        cmdOper(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "KICK")
+        cmdKick(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "PART")
+        cmdPart(parsedMessage, clientFd);
+    else
+        std::cout << "Unknown Command\n";
 
     // std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
 

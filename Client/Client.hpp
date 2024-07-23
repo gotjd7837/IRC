@@ -43,6 +43,8 @@ class Client
         std::string popMessageBuff();
         void pushMessageBuff(std::string& message);
 
+        std::string getPrefix();
+
         void reply(std::string message);
 
 };
