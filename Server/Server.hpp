@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <poll.h>
+#include <cctype>
 #include <csignal>
 
 #define RED "\e[1;31m" //-> for red color
@@ -64,6 +65,8 @@ class Server
         void cmdNick(MessageProtocol& parsedMessage, int clientFd);
         void cmdPong(MessageProtocol& parsedMessage, int clientFd);
         void cmdJoin(MessageProtocol& parsedMessage, int clientFd);
+        void cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd);
+        void cmdMode(MessageProtocol& parsedMessage, int clientFd);
 
         void clientCert(int clientFd);
 

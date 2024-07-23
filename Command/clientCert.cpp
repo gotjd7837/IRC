@@ -14,10 +14,12 @@ void Server::clientCert(int clientFd)
     {
         codeMsgReply(clientFd, 461);
         removeClient(clientFd);
+        return ;
     }
     else
     {
         codeMsgReply(clientFd, 464);
         removeClient(clientFd);
+        return ;
     }
 }
