@@ -19,27 +19,29 @@
 
 void Server::cmdPart(MessageProtocol& parsedMessage, int clientFd)
 {
-    Client* cli = getClient(clientFd);
+    std::string channelName = parsedMessage.getParams()[0];
+    Client* client = getClient(clientFd);
+    Channel* channel = getChannel(channelName);
 
     if (parsedMessage.getParams().empty())
-        codeMsgReply(clientFd, 461);
-
-    std::string channelName = parsedMessage.getParams()[0];
-    if (_channels.find(channelName) == _channels.end())
-        codeMsgReply(clientFd, 403);
-    if (_channels[channelName]->isMember(cli) == false)
-        codeMsgReply(clientFd, 442);
-
-    _channels[channelName]->removeMember(cli);
-    if (parsedMessage.getParams().size() > 1)
     {
-        ucastMsg(clientFd, std::string(":" + cli->getPrefix() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
-        ccastMsg(channelName, std::string(":" + cli->getPrefix() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
+        ucastMsg(clientFd, std::string("461 " + client->getNick() + " PART :Not enough parameters"));
+        return ;
     }
-    else
+    if (channel == nullptr)
     {
-        ucastMsg(clientFd, std::string(":" + cli->getPrefix() + " PART " + channelName));
-        ccastMsg(channelName, std::string(":" + cli->getPrefix() + " PART " + channelName));
-        ucastMsg(clientFd, std::string("442 " + cli->getNick() + " " + channelName + " :You're not on that channel"));
+        ucastMsg(clientFd, std::string("403 " + client->getNick() + " " + channelName + " :No such channel"));
+        return ;
     }
+    if (channel->isMember(client) == false)
+    {
+        ucastMsg(clientFd, std::string("442 " + client->getNick() + " " + channelName + " :You're not on that channel"));
+        return ;
+    }
+    
+    ccastMsg(channelName, std::string(client->getPrefix() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
+    ucastMsg(clientFd, std::string("442 " + client->getNick() + " " + channelName + " :You have left the channel"));
+    channel->removeMember(client);
+    if (channel->getMembers().empty())
+        removeChannel(channelName);
 }
