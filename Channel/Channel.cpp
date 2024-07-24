@@ -84,7 +84,26 @@ void Channel::removeMode(unsigned int mode)
 {
     _modes &= ~mode;
 }
-bool Channel::isMode(unsigned int mode)
+bool Channel::hasMode(unsigned int mode) const
 {
     return (_modes & mode);
+}
+
+std::string Channel::getMode() const 
+{
+    std::string mode = "+";
+
+    if (hasMode(MODE_O)) mode += "o";
+    if (hasMode(MODE_P)) mode += "p";
+    if (hasMode(MODE_S)) mode += "s";
+    if (hasMode(MODE_I)) mode += "i";
+    if (hasMode(MODE_T)) mode += "t";
+    if (hasMode(MODE_N)) mode += "n";
+    if (hasMode(MODE_M)) mode += "m";
+    if (hasMode(MODE_L)) mode += "l";
+    if (hasMode(MODE_B)) mode += "b";
+    if (hasMode(MODE_V)) mode += "v";
+    if (hasMode(MODE_K)) mode += "k";
+
+    return mode;
 }
