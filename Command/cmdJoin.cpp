@@ -60,6 +60,9 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
                 ucastMsg(it->first->getFd(), std::string(cli->getPrefix() + " JOIN " + targetChannel));
             }
 
+            // if (channel->hasMode(MODE_I))
+            //     ucastMsg(clientFd, std::string("473 " + cli->getNick() + " " + targetChannel + " :Cannot join channel (+i)"));
+                // +i 모드일 경우 입장 불가 부분
             channel->addMember(cli, op);
             ucastMsg(clientFd, std::string("332 " + targetChannel + " :" + "Welcome to the Foobar channel!"));
 
