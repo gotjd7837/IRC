@@ -48,6 +48,6 @@ void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
         return ;
     }
 
-    ccastMsg(channelName, std::string("KICK " + channelName + " " + targetNick + " " + parsedMessage.getParams()[2]));
+    ccastMsg(channelName, std::string(client->getPrefix() + " KICK " + channelName + " " + targetNick + " " + parsedMessage.getParams()[2]));
     channel->removeMember(targetClient);
 }
