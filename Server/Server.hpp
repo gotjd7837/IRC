@@ -77,6 +77,8 @@ class Server
         void cmdTopic(MessageProtocol& parsedMessage, int clientFd);
         void cmdInvite(MessageProtocol& parsedMessage, int clientFd);
 
+        Client* findClientByNick(std::string nick);
+
         void clientCert(int clientFd);
 
         void bcastMsg(std::string msg);

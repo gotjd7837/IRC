@@ -71,7 +71,8 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
             //     ucastMsg(clientFd, std::string("473 " + cli->getNick() + " " + targetChannel + " :Cannot join channel (+i)"));
                 // +i 모드일 경우 입장 불가 부분
             channel->addMember(cli, op);
-            ucastMsg(clientFd, std::string("332 " + targetChannel + " :" + "Welcome to the Foobar channel!"));
+            ucastMsg(clientFd, "TOPIC " + targetChannel + " " + channel->getTopic());
+            // 이걸 보내줘야 클라이언트가 토픽을 업데이트 할 수 있음
 
             if (op)
                 users += "@";
