@@ -39,6 +39,7 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
     }
     else if (mode == "+o")
     {
+        channel->addMode(MODE_O);
         if (parsedMessage.getParams().size() < 3)
         {
             ucastMsg(clientFd, std::string("461 " + client->getNick() + " MODE :Not enough parameters"));
@@ -56,6 +57,7 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
     }
     else if (mode == "-o")
     {
+        channel->removeMode(MODE_O);
         if (parsedMessage.getParams().size() < 3)
         {
             ucastMsg(clientFd, std::string("461 " + client->getNick() + " MODE :Not enough parameters"));
@@ -73,6 +75,7 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
     }
     else if (mode == "+k")
     {
+        channel->addMode(MODE_K);
         if (parsedMessage.getParams().size() < 3)
         {
             ucastMsg(clientFd, std::string("461 " + client->getNick() + " MODE :Not enough parameters"));
@@ -84,11 +87,13 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
     }
     else if (mode == "-k")
     {
+        channel->removeMode(MODE_K);
         channel->setKey("");
         ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode));
     }
     else if (mode == "+l")
     {
+        channel->addMode(MODE_L);
         if (parsedMessage.getParams().size() < 3)
         {
             ucastMsg(clientFd, std::string("461 " + client->getNick() + " MODE :Not enough parameters"));
@@ -106,6 +111,7 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
     }
     else if (mode == "-l")
     {
+        channel->removeMode(MODE_L);
         channel->setLimit(UINT_MAX);
         ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode));
     }

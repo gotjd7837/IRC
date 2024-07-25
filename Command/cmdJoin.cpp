@@ -37,7 +37,7 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
     std::vector<std::string>targetChannels = split(parsedMessage.getParams()[0], ',');
     std::vector<std::string>targetKeys;
     if (parsedMessage.getParams().size() > 1)
-        std::vector<std::string>targetKeys = split(parsedMessage.getParams()[1], ',');
+        targetKeys = split(parsedMessage.getParams()[1], ',');
 
     for (int i = 0; i < targetChannels.size(); i++)
     {
@@ -57,18 +57,20 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
         }
 
         Channel* channel = _channels[targetChannel];
-        if (channel->hasMode(MODE_L) && !channel->checkLimit())
-        {
-            ucastMsg(clientFd, std::string("471 " + targetChannel + " :Cannot join channel (+l)"));
-            continue;
-        }
+
         if (channel->hasMode(MODE_I))
         {
-            ucastMsg(clientFd, std::string("473 " + targetChannel + " :Cannot join channel (+i)"));
+            ucastMsg(clientFd, std::string("473 " + cli->getNick() + " :" + targetChannel));
             continue;
         }
         if (!channel->hasMode(MODE_K) || targetKey == channel->getKey())
         {
+            if (channel->hasMode(MODE_L) && !channel->checkLimit())
+            {
+                ucastMsg(clientFd, std::string("471 " + cli->getNick() + " :" + targetChannel));
+                continue;
+            }
+            
             std::string users = "";
             for(std::map<Client *, bool>::const_iterator it = channel->getMembers().begin(); it != channel->getMembers().end(); it++)
             {
