@@ -155,12 +155,14 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         cmdPrivMsg(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "MODE")
         cmdMode(parsedMessage, clientFd);
-    else if (parsedMessage.getCommand() == "OPER")
-        cmdOper(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "KICK")
         cmdKick(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "PART")
         cmdPart(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "TOPIC")
+        cmdTopic(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "INVITE")
+        cmdInvite(parsedMessage, clientFd);
     else
         std::cout << "Unknown Command\n";
 

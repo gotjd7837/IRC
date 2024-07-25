@@ -73,12 +73,12 @@ class Server
         void cmdKick(MessageProtocol& parsedMessage, int clientFd);
         void cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd);
         void cmdMode(MessageProtocol& parsedMessage, int clientFd);
-        void cmdOper(MessageProtocol& parsedMessage, int clientFd);
+        void cmdQuit(MessageProtocol& parsedMessage, int clientFd);
+        void cmdTopic(MessageProtocol& parsedMessage, int clientFd);
+        void cmdInvite(MessageProtocol& parsedMessage, int clientFd);
 
         void clientCert(int clientFd);
 
-        void codeMsgReply(int clientFd, int code);
-        void sendMsg(int clientFd, char *code, std::string nick, char *msg);
         void bcastMsg(std::string msg);
         void ucastMsg(int clientFd, std::string msg);
         void ccastMsg(std::string channelName, std::string msg);

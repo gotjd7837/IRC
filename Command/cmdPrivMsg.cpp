@@ -25,7 +25,7 @@ void Server::cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd)
     Client* cli = getClient(clientFd);
 
     if (parsedMessage.getParams().size() < 2)
-        codeMsgReply(clientFd, 461);
+        ucastMsg(clientFd, std::string("461 " + cli->getNick() + " PRIVMSG :Not enough parameters"));
 
     std::vector<std::string>targetlist = split(parsedMessage.getParams()[0], ',');
 

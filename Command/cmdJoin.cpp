@@ -3,6 +3,13 @@
 #include "../MessageProtocol/MessageProtocol.hpp"
 #include "../Channel/Channel.hpp"
 
+// void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
+// {
+//     Client* client = getClient(clientFd);
+
+// }
+
+
 static std::vector<std::string> split(const std::string& str, char delimiter) 
 {
     std::vector<std::string> tokens;
@@ -25,7 +32,7 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
     Client* cli = getClient(clientFd);
 
     if (parsedMessage.getParams().empty())
-        codeMsgReply(clientFd, 461);
+        ucastMsg(clientFd, std::string("461 " + cli->getNick() + " JOIN :Not enough parameters"));
     
     std::vector<std::string>targetChannels = split(parsedMessage.getParams()[0], ',');
     std::vector<std::string>targetKeys;
@@ -73,6 +80,6 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
             ucastMsg(clientFd, std::string("366 " + cli->getNick() + " " + targetChannel + " :" + "End of /NAMES list"));
         }
         else
-            codeMsgReply(clientFd, 475);
+            ucastMsg(clientFd, std::string("475 " + cli->getNick() + " " + targetChannel + " :Bad channel key"));
     }
 }

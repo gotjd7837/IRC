@@ -41,7 +41,7 @@ void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
     }
 
     std::string targetNick = parsedMessage.getParams()[1];
-    Client* targetClient = channel->searchMemberNick(targetNick);
+    Client* targetClient = channel->getMember(targetNick);
     if (targetClient == nullptr)
     {
         ucastMsg(clientFd, std::string("441 " + client->getNick() + " " + targetNick + " :They aren't on that channel"));

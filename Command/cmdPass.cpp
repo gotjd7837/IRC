@@ -10,9 +10,9 @@ void Server::cmdPass(MessageProtocol& parsedMessage, int clientFd)
         return ;
 
     if (parsedMessage.getParams().empty())
-        codeMsgReply(clientFd, 461);
+        ucastMsg(clientFd, "461 PASS : Not enough parameters");
     if (cli->getCert())
-        codeMsgReply(clientFd, 462);
+        ucastMsg(clientFd, "462 PASS :You are already registered");
 
     cli->setPass(parsedMessage.getParams()[0]);
 }

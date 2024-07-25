@@ -12,13 +12,13 @@ void Server::clientCert(int clientFd)
         cli->setCert(true);
     else if (cli->getPass() == "")
     {
-        codeMsgReply(clientFd, 461);
+        ucastMsg(clientFd, "461 " + cli->getNick() + " :need to PASS first");
         removeClient(clientFd);
         return ;
     }
     else
     {
-        codeMsgReply(clientFd, 464);
+        ucastMsg(clientFd, "464 " + cli->getNick() + " :incorrect password");
         removeClient(clientFd);
         return ;
     }

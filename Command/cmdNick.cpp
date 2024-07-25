@@ -21,7 +21,7 @@ void Server::cmdNick(MessageProtocol& parsedMessage, int clientFd)
         std::string nickname = it->second->getNick();
         if (nickname == parsedMessage.getParams()[0])
         {
-            codeMsgReply(clientFd, 407);
+            ucastMsg(clientFd, "407 " + parsedMessage.getParams()[0] + " :Nickname is already in use");
             return ;
         }
     }
