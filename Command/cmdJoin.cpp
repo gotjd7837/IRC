@@ -3,13 +3,6 @@
 #include "../MessageProtocol/MessageProtocol.hpp"
 #include "../Channel/Channel.hpp"
 
-// void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
-// {
-//     Client* client = getClient(clientFd);
-
-// }
-
-
 static std::vector<std::string> split(const std::string& str, char delimiter) 
 {
     std::vector<std::string> tokens;
