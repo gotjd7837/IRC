@@ -36,7 +36,7 @@ void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
     }
     if (channel->isOper(client) == false)
     {
-        ucastMsg(clientFd, std::string("482 " + client->getNick() + " :You're not channel operator"));
+        ucastMsg(clientFd, std::string("482 " + channelName + " :You're not channel operator"));
         return ;
     }
 

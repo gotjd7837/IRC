@@ -44,9 +44,6 @@ class Client
         void pushMessageBuff(std::string& message);
 
         std::string getPrefix();
-
-        void reply(std::string message);
-
 };
 
 #endif

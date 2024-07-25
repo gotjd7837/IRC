@@ -12,7 +12,7 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
         return ;
     if (channel->isOper(client) == false)
     {
-        ucastMsg(clientFd, std::string("482 " + client->getNick() + " :You're not channel operator"));
+        ucastMsg(clientFd, std::string("482 " + channelName + " :You're not channel operator"));
         return ;
     }
 
