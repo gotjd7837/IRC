@@ -52,10 +52,22 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
         {
             op = true;
             _channels[targetChannel] = new Channel(targetChannel, targetKey);
+            if (targetKey != "")
+                _channels[targetChannel]->addMode(MODE_K);
         }
 
-        Channel* channel = _channels.find(targetChannel)->second;
-        if (targetKey == channel->getKey())
+        Channel* channel = _channels[targetChannel];
+        if (channel->hasMode(MODE_L) && !channel->checkLimit())
+        {
+            ucastMsg(clientFd, std::string("471 " + targetChannel + " :Cannot join channel (+l)"));
+            continue;
+        }
+        if (channel->hasMode(MODE_I))
+        {
+            ucastMsg(clientFd, std::string("473 " + targetChannel + " :Cannot join channel (+i)"));
+            continue;
+        }
+        if (!channel->hasMode(MODE_K) || targetKey == channel->getKey())
         {
             std::string users = "";
             for(std::map<Client *, bool>::const_iterator it = channel->getMembers().begin(); it != channel->getMembers().end(); it++)
@@ -67,9 +79,6 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
                 ucastMsg(it->first->getFd(), std::string(cli->getPrefix() + " JOIN " + targetChannel));
             }
 
-            // if (channel->hasMode(MODE_I))
-            //     ucastMsg(clientFd, std::string("473 " + cli->getNick() + " " + targetChannel + " :Cannot join channel (+i)"));
-                // +i 모드일 경우 입장 불가 부분
             channel->addMember(cli, op);
             ucastMsg(clientFd, "TOPIC " + targetChannel + " " + channel->getTopic());
             // 이걸 보내줘야 클라이언트가 토픽을 업데이트 할 수 있음
@@ -81,6 +90,6 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
             ucastMsg(clientFd, std::string("366 " + cli->getNick() + " " + targetChannel + " :" + "End of /NAMES list"));
         }
         else
-            ucastMsg(clientFd, std::string("475 " + cli->getNick() + " " + targetChannel + " :Bad channel key"));
+            ucastMsg(clientFd, std::string("475 " + cli->getNick() + " " + targetChannel + " :Cannot join channel (+k)"));
     }
 }
