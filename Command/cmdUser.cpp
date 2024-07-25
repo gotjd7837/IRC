@@ -15,7 +15,7 @@ void Server::cmdUser(MessageProtocol& parsedMessage, int clientFd)
         return ;
     if (cli->getNick() == "")
     {
-        codeMsgReply(clientFd, 461);
+        ucastMsg(clientFd, "461 USER :Not enough parameters");
         removeClient(clientFd);
         return ;
     }

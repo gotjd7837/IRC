@@ -1,7 +1,8 @@
 #include "Channel.hpp"
 #include "../Client/Client.hpp"
 
-Channel::Channel(std::string name, std::string key) : _name(name), _key(key), _modes(0x0) {}
+Channel::Channel(std::string name, std::string key) : _name(name), _key(key), _modes(0x0), _limit(UINT_MAX) {}
+
 // Getter and Setter for _name
 const std::string& Channel::getName() const 
 {
@@ -32,6 +33,21 @@ const std::string& Channel::getTopic() const
 void Channel::setTopic(const std::string& topic) 
 {
     _topic = topic;
+}
+
+unsigned int Channel::getLimit() const 
+{
+    return _limit;
+}
+
+void Channel::setLimit(unsigned int limit) 
+{
+    _limit = limit;
+}
+
+bool Channel::checkLimit() const 
+{
+    return (_members.size() < _limit);
 }
 
 // Getter and Setter for _members
@@ -66,7 +82,17 @@ bool Channel::isOper(Client* client) const
     return (_members.find(client) != _members.end() && _members.find(client)->second);
 }
 
-Client* Channel::searchMemberNick(const std::string& nick) const 
+void Channel::addOper(Client* client) 
+{
+    _members.find(client)->second = true;
+}
+
+void Channel::removeOper(Client* client) 
+{
+    _members.find(client)->second = false;
+}
+
+Client* Channel::getMember(const std::string& nick) const 
 {
     for (std::map<Client*, bool>::const_iterator it = _members.begin(); it != _members.end(); it++)
     {

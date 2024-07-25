@@ -25,6 +25,7 @@ private:
     std::string _name;
     std::string _topic;
     std::string _key;
+    unsigned int _limit;
     unsigned int _modes;
     std::map<Client*, bool> _members;
 
@@ -42,16 +43,24 @@ public:
     const std::string& getTopic() const;
     void setTopic(const std::string& topic);
 
+    unsigned int getLimit() const;
+    void setLimit(unsigned int limit);
+
     // Getter and Setter for _members
     const std::map<Client*, bool>& getMembers() const;
     void setMembers(const std::map<Client*, bool>& members);
+    Client* getMember(const std::string& nick) const;
+    void addOper(Client* client);
+    void removeOper(Client* client);
 
     // Additional methods for managing members
     void addMember(Client* client, bool status);
     void removeMember(Client* client);
     bool isMember(Client* client) const;
     bool isOper(Client* client) const;
-    Client* searchMemberNick(const std::string& nick) const;
+
+    bool checkLimit() const;
+    bool checkKey(const std::string& key) const;
 
     void addMode(unsigned int mode);
     void removeMode(unsigned int mode);

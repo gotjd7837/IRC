@@ -3,99 +3,112 @@
 #include "../MessageProtocol/MessageProtocol.hpp"
 #include "../Channel/Channel.hpp"
 
-static unsigned int modeFlag(char c)
-{
-    switch(c)
-    {
-        case 'i': return (MODE_I); //가능 , 초대 전용 모드 채널으로 할건지 말지
-        case 't': return (MODE_T); //가능 , 토픽 변경 권한 오퍼레이터만 가능하게 할건지 아닌지
-
-
-        case 'o': return (MODE_O); // 불가능 , 채널의 유저에게 오퍼권한 부여할건지 말건지
-        case 'k': return (MODE_K); // 불가능 , 채널에 비밀번호 설정할건지 말건지
-        case 'l': return (MODE_L); //불가능 , 채널에 유저 제한 걸건지 말건지
-        //case 'p': return (MODE_P);
-        //case 's': return (MODE_S);
-        //case 'n': return (MODE_N);
-        //case 'm': return (MODE_M);
-        //case 'b': return (MODE_B);
-        //case 'v': return (MODE_V);
-        default: return (0);
-    }
-}
-
 void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
 {
-    Client* cli = getClient(clientFd);
-    Channel* cha = getChannel(parsedMessage.getParams()[0]);
-
-    if (cha == NULL)
+    Client* client = getClient(clientFd);
+    std::string channelName = parsedMessage.getParams()[0];
+    Channel* channel = getChannel(channelName);
+    if (parsedMessage.getParams().size() < 2 || channel == nullptr)
         return ;
-    if (parsedMessage.getParams().size() < 2)
-        return ;
-    unsigned int add = 0, remove = 0;
-
-    std::string tmp = parsedMessage.getParams()[1];
-    if (tmp == "+o")
+    if (channel->isOper(client) == false)
     {
-        return ;
-    }
-    if (tmp == "-o")
-    {
-        return ;
-    }
-    if (tmp == "+k")
-    {
-        return ;
-    }
-    if (tmp == "-k")
-    {
-        return ;
-    }
-    if (tmp == "+l")
-    {
-        return ;
-    }
-    if (tmp == "-l")
-    {
+        ucastMsg(clientFd, std::string("482 " + client->getNick() + " :You're not channel operator"));
         return ;
     }
 
-    for (int i = 1; i < tmp.size(); i++)
+    std::string mode = parsedMessage.getParams()[1];
+    if (mode == "+i")
     {
-        unsigned int bit = 0;
-        if (tmp[0] == '+')
+        channel->addMode(MODE_I);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode));
+    }
+    else if (mode == "-i")
+    {
+        channel->removeMode(MODE_I);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode));
+    }
+    else if (mode == "+t")
+    {
+        channel->addMode(MODE_T);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode));
+    }
+    else if (mode == "-t")
+    {
+        channel->removeMode(MODE_T);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode));
+    }
+    else if (mode == "+o")
+    {
+        if (parsedMessage.getParams().size() < 3)
         {
-            bit = modeFlag(tmp[i]);
-            if (bit == 0) 
-            {
-                ucastMsg(clientFd, std::string("472 " + getClient(clientFd)->getNick() 
-                + " " + parsedMessage.getParams()[1] + " :is unknown mode char to me"));
-                return ;
-            }
-            add |= bit;
-        }
-        else if (tmp[0] == '-')
-        {
-            bit = modeFlag(tmp[i]);
-            if (bit == 0) 
-            {
-                ucastMsg(clientFd, std::string("472 " + getClient(clientFd)->getNick() 
-                + " " + parsedMessage.getParams()[1] + " :is unknown mode char to me"));
-                return ;
-            }
-            remove |= bit;
-        }
-        else
-        {
-            ucastMsg(clientFd, std::string("472 " + getClient(clientFd)->getNick() 
-            + " " + parsedMessage.getParams()[1] + " :is unknown mode char to me"));
+            ucastMsg(clientFd, std::string("461 " + client->getNick() + " MODE :Not enough parameters"));
             return ;
         }
+        std::string nick = parsedMessage.getParams()[2];
+        Client* target = channel->getMember(nick);
+        if (target == nullptr)
+        {
+            ucastMsg(clientFd, std::string("401 " + client->getNick() + " " + nick + " :No such nick/channel"));
+            return ;
+        }
+        channel->addOper(target);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode + " " + nick));
     }
-    cha->addMode(add);
-    cha->removeMode(remove);
-
-    // ccastMsg(cha->getName(), std::string("324 " + cli->getNick() + " " + cha->getName() + " " + cha->getMode()));
-    ccastMsg(cha->getName(), std::string(cli->getPrefix() + " MODE " + cha->getName() + " " + parsedMessage.getParams()[1]));
-}   
+    else if (mode == "-o")
+    {
+        if (parsedMessage.getParams().size() < 3)
+        {
+            ucastMsg(clientFd, std::string("461 " + client->getNick() + " MODE :Not enough parameters"));
+            return ;
+        }
+        std::string nick = parsedMessage.getParams()[2];
+        Client* target = channel->getMember(nick);
+        if (target == nullptr)
+        {
+            ucastMsg(clientFd, std::string("401 " + client->getNick() + " " + nick + " :No such nick/channel"));
+            return ;
+        }
+        channel->removeOper(target);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode + " " + nick));
+    }
+    else if (mode == "+k")
+    {
+        if (parsedMessage.getParams().size() < 3)
+        {
+            ucastMsg(clientFd, std::string("461 " + client->getNick() + " MODE :Not enough parameters"));
+            return ;
+        }
+        std::string key = parsedMessage.getParams()[2];
+        channel->setKey(key);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode + " " + key));
+    }
+    else if (mode == "-k")
+    {
+        channel->setKey("");
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode));
+    }
+    else if (mode == "+l")
+    {
+        if (parsedMessage.getParams().size() < 3)
+        {
+            ucastMsg(clientFd, std::string("461 " + client->getNick() + " MODE :Not enough parameters"));
+            return ;
+        }
+        std::string limit = parsedMessage.getParams()[2];
+        int limitInt = std::stoi(limit);
+        if (limitInt < 0)
+        {
+            ucastMsg(clientFd, std::string("472 " + client->getNick() + " " + limit + " :Channel limit must be greater than 0"));
+            return ;
+        }
+        channel->setLimit(limitInt);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode + " " + limit));
+    }
+    else if (mode == "-l")
+    {
+        channel->setLimit(UINT_MAX);
+        ccastMsg(channelName, std::string(client->getPrefix() + " MODE " + channelName + " " + mode));
+    }
+    else
+        ucastMsg(clientFd, std::string("472 " + client->getNick() + " " + mode + " :is unknown mode char to me"));
+}

@@ -9,7 +9,8 @@ SOURCE = main.cpp \
 		Client/Client.cpp \
 		MessageProtocol/MessageProtocol.cpp \
 		Command/*.cpp \
-		Channel/Channel.cpp
+		Channel/Channel.cpp \
+		Utils/*.cpp
 
 $(NAME): $(SOURCE)
 	$(CC) $(FLAGS) $(SOURCE) -o $(NAME)
