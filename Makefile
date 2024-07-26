@@ -2,25 +2,26 @@ NAME = ircserv
 
 CC = c++
 
-FLAGS = #-g -Werror -Wall -Wextra -std=c++98
+FLAGS = -Werror -Wall -Wextra -std=c++98
 
-SOURCE = main.cpp \
-		Server/Server.cpp \
-		Client/Client.cpp \
-		MessageProtocol/MessageProtocol.cpp \
-		Command/*.cpp \
-		Channel/Channel.cpp \
-		Utils/*.cpp
+SOURCES = $(wildcard *.cpp */*.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
 
-$(NAME): $(SOURCE)
-	$(CC) $(FLAGS) $(SOURCE) -o $(NAME)
+$(NAME): $(OBJECTS)
+	$(CC) $(FLAGS) $(OBJECTS) -o $(NAME)
+
+%.o: %.cpp
+	$(CC) $(FLAGS) -c $< -o $@
 
 all: $(NAME)
 
 clean:
+	rm -f $(OBJECTS)
+
+fclean: clean
 	rm -f $(NAME)
 	rm -rf ircserv.dSYM
 
-re: clean all
+re: fclean all
 
-.PHONY: all clean re
+.PHONY: all clean fclean re

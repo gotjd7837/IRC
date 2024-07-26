@@ -1,7 +1,7 @@
 #include "Channel.hpp"
 #include "../Client/Client.hpp"
 
-Channel::Channel(std::string name, std::string key) : _name(name), _key(key), _modes(0x0), _limit(UINT_MAX) {}
+Channel::Channel(std::string name, std::string key) : _name(name), _key(key), _limit(UINT_MAX), _modes(0x0) {}
 
 // Getter and Setter for _name
 const std::string& Channel::getName() const 

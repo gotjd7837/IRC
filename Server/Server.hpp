@@ -13,12 +13,10 @@
 #include <cctype>
 #include <csignal>
 
-#define RED "\e[1;31m" //-> for red color
-#define WHI "\e[0;37m" //-> for white color
-#define GRE "\e[1;32m" //-> for green color
-#define YEL "\e[1;33m" //-> for yellow color
-
-#define SERVER_PORT 6667
+#define RED "\e[1;31m"
+#define WHI "\e[0;37m"
+#define GRE "\e[1;32m"
+#define YEL "\e[1;33m"
 
 class Client;
 class Channel;
@@ -27,15 +25,12 @@ class MessageProtocol;
 class Server
 {
     private :
-        std::string _name;
-        
         int _serverSocket;
         static bool _signal;
         std::string _password;
         std::string _port;
-
-        std::map<std::string, Channel *> _channels;
         std::map<int, Client *> _clients;
+        std::map<std::string, Channel *> _channels;
         std::vector<struct pollfd> _pollFds;
 
     public :

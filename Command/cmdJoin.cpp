@@ -32,7 +32,7 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
     if (parsedMessage.getParams().size() > 1)
         targetKeys = split(parsedMessage.getParams()[1], ',');
 
-    for (int i = 0; i < targetChannels.size(); i++)
+    for (size_t i = 0; i < targetChannels.size(); i++)
     {
         std::string targetChannel = targetChannels[i];
         std::string targetKey = "";

@@ -22,7 +22,6 @@ class Client
         std::string _username;
         std::string _realname;
         std::string _password;
-        // std::string _host;
         std::string _messageBuff;
     
     public :

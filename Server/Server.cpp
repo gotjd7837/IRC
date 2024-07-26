@@ -11,7 +11,12 @@ Server::Server(std::string port, std::string password) : _serverSocket(-1), _pas
 
 Server::~Server()
 {
-    //메모리 해제
+    for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); it++)
+        delete it->second;
+    for (std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); it++)
+        delete it->second;
+    if (_serverSocket != -1)
+        close(_serverSocket);
 }
 
 void Server::signalHandler(int signal)
@@ -103,7 +108,7 @@ void Server::serverSocket()
     struct pollfd new_poll;
 
     add.sin_family = AF_INET;
-    add.sin_port = htons(SERVER_PORT);
+    add.sin_port = htons(atoi(_port.c_str()));
     add.sin_addr.s_addr = INADDR_ANY;
 
     _serverSocket = socket(AF_INET, SOCK_STREAM, 0); //-> create the server socket
@@ -125,14 +130,6 @@ void Server::serverSocket()
 	_pollFds.push_back(new_poll); //-> add the server socket to the pollfd
 }
 
-
-
-
-
-
-
-
-// command 처리 인터페이스
 void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
 {
     (void)clientFd;
@@ -194,25 +191,6 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
     // }
 }
 
-/*
-PASS : 서버에 연결하기 위한 패스워드를 확인한다.
-NICK : 닉네임을 변경한다.
-USER : 유저 이름을 변경한다.
-JOIN : 채널에 입장한다.
-PART : 채널에서 나간다.
-PRIVMSG : 특정 사용자 또는 채널에 메시지를 보낸다.
-NOTICE : 서버의 유저에게 메시지를 보낸다.
-LIST : 현재 서버에서 사용 가능한 채널 목록을 조회한다.
-PING : 클라이언트-서버 간의 연결을 확인한다.
-OPER : 관리자 권한을 얻는다.
-KICK : 유저를 특정 채널에서 내보낸다.
-QUIT : IRC 서버에서 나간다.
-*/
-
-
-
-
-// client의 버퍼와 현재 recv한 메세지를 combine해서 클라이언트 객체에 저장, 반환
 std::string Server::makeCombinedMessage(std::string clientMessage, int clientFd)
 {
     std::string remainMessage = getClient(clientFd)->popMessageBuff();
@@ -220,7 +198,6 @@ std::string Server::makeCombinedMessage(std::string clientMessage, int clientFd)
     return (remainMessage);
 }
 
-// target client 소켓에서 메세지 recv
 std::string Server::recvClientMessage(int clientFd)
 {
     char    buff[512];
@@ -238,7 +215,6 @@ std::string Server::recvClientMessage(int clientFd)
     return (receivedMessage);
 }
 
-// 본격적인 파싱, combined 메세지에서 irc프로토콜의 메세지를 분리 후 파싱, 남은건 client 버퍼에 저장
 void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
 {
     std::string tmp;
@@ -246,26 +222,24 @@ void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
     for (size_t i = 0; i < combinedMessage.size(); i++)
     {
         tmp += combinedMessage[i];
-        if (1 < tmp.size() && tmp[tmp.size() - 1] == '\n' && tmp[tmp.size() - 2] == '\r') // cr-lf가 있는 완전한 메세지는 excuteCommand로 전달
+        if (1 < tmp.size() && tmp[tmp.size() - 1] == '\n' && tmp[tmp.size() - 2] == '\r')
         {
             std::string completeMessage = tmp.substr(0, tmp.size() - 2);
             excuteCommand(MessageProtocol(completeMessage), clientFd);
             tmp.clear();
         }
     }
-    // cr-lf가 없는 message는 client 객체 _messageBuff에 저장
     if (getClient(clientFd) != nullptr)
         getClient(clientFd)->pushMessageBuff(tmp);
     return ;
 }
 
-// client request 처리
 void Server::handleClientRequest(int targetFd)
 {
-    std::cout << "handle client request...\n";
-    std::string clientMessage = recvClientMessage(targetFd); // target 소켓에서 데이터 recv
+    std::cout << YEL << "handle client request..." << WHI << std::endl;
+    std::string clientMessage = recvClientMessage(targetFd);
 
-    if (clientMessage.size() == 0) // 소켓 이벤트 POLLIN의 메세지가 "" 빈문자열 메세지일 경우 disconnect를 의미
+    if (clientMessage.size() == 0)
     {
         removeClient(targetFd);
         return ;
@@ -292,8 +266,6 @@ void Server::handleEvent()
 
 void Server::serverInit()
 {
-    _name = std::string("ircserv");
-    _password = std::string("1234");
     serverSocket();
 
     std::cout << GRE << "Server <" << _serverSocket << "> Connected" << WHI << std::endl;
@@ -301,7 +273,7 @@ void Server::serverInit()
 
     while (_signal == false)
     {
-        if((poll(&_pollFds[0], _pollFds.size(), -1) == -1) && _signal == false) //-> wait for an event
+        if((poll(&_pollFds[0], _pollFds.size(), -1) == -1) && _signal == false)
 			throw(std::runtime_error("poll() failed"));
         handleEvent();
     }
