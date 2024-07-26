@@ -35,7 +35,7 @@ class Server
 
     public :
         Server();
-        Server(std::string password, std::string port);
+        Server(std::string port, std::string password);
         ~Server();
 
         static void signalHandler(int _signal);
