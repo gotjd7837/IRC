@@ -7,7 +7,7 @@ int main(int ac, char **av)
 		std::cerr << "Usage: ./ircserv [port] [password]" << std::endl;
 		return (1);
 	}
-	Server ser(av[2], av[1]);
+	Server ser(av[1], av[2]);
 	std::cout << "---- SERVER ----" << std::endl;
 	try{
 		signal(SIGINT, Server::signalHandler);

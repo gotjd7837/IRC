@@ -130,6 +130,7 @@ void Server::serverSocket()
 void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
 {
     (void)clientFd;
+    std::cout << RED << "parsed Message.." << WHI << std::endl;
     std::cout << "prefix : " << parsedMessage.getPrefix() << std::endl;
     std::cout << "command : " << parsedMessage.getCommand() << std::endl;
     for (size_t i = 0; i < parsedMessage.getParams().size(); i++)
@@ -207,7 +208,6 @@ void Server::handleCombinedMessage(std::string combinedMessage, int clientFd)
 
 void Server::handleClientRequest(int targetFd)
 {
-    std::cout << YEL << "handle client request..." << WHI << std::endl;
     std::string clientMessage = recvClientMessage(targetFd);
 
     if (clientMessage.size() == 0)
