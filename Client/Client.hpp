@@ -26,6 +26,7 @@ class Client
     
     public :
         Client();
+        ~Client();
         int getFd();
         bool getCert();
         std::string getPass();

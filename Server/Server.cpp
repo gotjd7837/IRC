@@ -33,16 +33,13 @@ Client* Server::getClient(int clientFd)
     return (_clients[clientFd]);
 }
 
-// server에서 특정 client 삭제
 void Server::removeClient(int clientFd)
 {
-    std::cout << "disconnect [" << clientFd << "] Client" << "\n";
+    std::cout << RED << "Client <" << clientFd << "> Disconnected" << WHI << std::endl;
 
-    // for (channel)
-    //     {
-    //         channaliter->removemember(_clients[clientFd])
-    //     }
-    delete _clients[clientFd];
+    Client* client = getClient(clientFd);
+
+    delete client;
     _clients.erase(clientFd);
 
     for (size_t i = 0; i < _pollFds.size(); i++)
@@ -161,34 +158,8 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
     else if (parsedMessage.getCommand() == "INVITE")
         cmdInvite(parsedMessage, clientFd);
     else
-        std::cout << "Unknown Command\n";
-
-    // std::string cmd[] = {"INVITE", "JOIN", "KICK", "MODE", "NICK", "PART", "PASS", "PING", "PONG", "PRIVMSG", "QUIT", "TOPIC", "USER"};
-
-    // void (Server::*func[13])(MessageProtocol, int) = {
-        // &Server::cmdInvite,
-        // &Server::cmdJoin,
-        // &Server::cmdKick,
-        // &Server::cmdMode,
-        // &Server::cmdNick,
-        // &Server::cmdPart,
-        // &Server::cmdPass,
-        // &Server::cmdPing,
-        // &Server::cmdPong,
-        // &Server::cmdPrivmsg,
-        // &Server::cmdQuit,
-        // &Server::cmdTopic,
-        // &Server::cmdUser
-    // };
-
-    // for (int i = 0; i < 13; i++)
-    // {
-    //     if (parsedMessage.getCommand() == cmd[i])
-    //     {
-    //         (this->*func[i])(parsedMessage, clientFd);
-    //         return ;
-    //     }
-    // }
+        ucastMsg(clientFd, getClient(clientFd)->getPrefix() + " 421 " 
+        + getClient(clientFd)->getNick() + " " + parsedMessage.getCommand() + " :Unknown command");
 }
 
 std::string Server::makeCombinedMessage(std::string clientMessage, int clientFd)
