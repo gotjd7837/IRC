@@ -3,7 +3,8 @@
 
 Channel::Channel(std::string name, std::string key) : _name(name), _key(key), _limit(UINT_MAX), _modes(0x0) {}
 
-// Getter and Setter for _name
+Channel::~Channel() {}
+
 const std::string& Channel::getName() const 
 {
     return _name;
@@ -61,7 +62,6 @@ void Channel::setMembers(const std::map<Client*, bool>& members)
     _members = members;
 }
 
-// Additional methods for managing members
 void Channel::addMember(Client* client, bool status) 
 {
     _members[client] = status;

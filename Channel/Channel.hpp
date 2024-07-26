@@ -34,6 +34,7 @@ private:
 public:
 
     Channel(std::string name, std::string key = "");
+    ~Channel();
     // Getter and Setter for _name
     const std::string& getName() const;
     void setName(const std::string& name);

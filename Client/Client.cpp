@@ -9,6 +9,8 @@ _username(""),
 _realname(""), 
 _password("")  {}
 
+Client::~Client() {}
+
 int Client::getFd()
 {
     return (_fd);
