@@ -53,8 +53,11 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
 
         if (channel->hasMode(MODE_I))
         {
-            ucastMsg(clientFd, std::string("473 " + cli->getNick() + " :" + targetChannel));
-            continue;
+            if (!channel->isInvited(cli->getNick()))
+            {
+                ucastMsg(clientFd, std::string("473 " + cli->getNick() + " :" + targetChannel));
+                continue;
+            }
         }
         if (!channel->hasMode(MODE_K) || targetKey == channel->getKey())
         {
@@ -75,6 +78,8 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
             }
 
             channel->addMember(cli, op);
+            channel->removeInvite(cli->getNick());
+
             ucastMsg(clientFd, "TOPIC " + targetChannel + " " + channel->getTopic());
             // 이걸 보내줘야 클라이언트가 토픽을 업데이트 할 수 있음
 
