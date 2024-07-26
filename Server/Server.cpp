@@ -62,17 +62,17 @@ void Server::addClient()
     struct sockaddr_in add;
     socklen_t len = sizeof(add);
 
-    int new_fd = accept(_serverSocket, (struct sockaddr *)&add, &len); //-> accept the new connection
+    int new_fd = accept(_serverSocket, (struct sockaddr *)&add, &len);
     if (new_fd == -1)
         throw(std::runtime_error("accept() faild"));
 
-    if (fcntl(new_fd, F_SETFL, O_NONBLOCK) == -1) //-> set the socket option (O_NONBLOCK) for non-blocking socket
+    if (fcntl(new_fd, F_SETFL, O_NONBLOCK) == -1)
         throw(std::runtime_error("faild to set option (O_NONBLOCK) on socket"));
 
-    new_poll.fd = new_fd; //-> add the new client socket to the pollfd
-    new_poll.events = POLLIN; //-> set the event to POLLIN for reading data
-    new_poll.revents = 0; //-> set the revents to 0
-    _pollFds.push_back(new_poll); //-> add the new client socket to the pollfd
+    new_poll.fd = new_fd;
+    new_poll.events = POLLIN;
+    new_poll.revents = 0;
+    _pollFds.push_back(new_poll);
 
     cli->setFd(new_fd);
     cli->setIpaddr(inet_ntoa(add.sin_addr));
@@ -108,7 +108,7 @@ void Server::serverSocket()
     add.sin_port = htons(atoi(_port.c_str()));
     add.sin_addr.s_addr = INADDR_ANY;
 
-    _serverSocket = socket(AF_INET, SOCK_STREAM, 0); //-> create the server socket
+    _serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (_serverSocket == -1)
         throw(std::runtime_error("faild to create socket"));
     int en = 1;
@@ -158,6 +158,8 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         cmdTopic(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "INVITE")
         cmdInvite(parsedMessage, clientFd);
+    else if (parsedMessage.getCommand() == "WHO")
+        return ;
     else
         ucastMsg(clientFd, getClient(clientFd)->getPrefix() + " 421 " 
         + getClient(clientFd)->getNick() + " " + parsedMessage.getCommand() + " :Unknown command");
