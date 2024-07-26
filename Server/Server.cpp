@@ -115,19 +115,19 @@ void Server::serverSocket()
     if (_serverSocket == -1)
         throw(std::runtime_error("faild to create socket"));
     int en = 1;
-    if(setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &en, sizeof(en)) == -1) //-> set the socket option (SO_REUSEADDR) to reuse the address
+    if(setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &en, sizeof(en)) == -1)
 		throw(std::runtime_error("faild to set option (SO_REUSEADDR) on socket"));
-    if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) == -1) //-> set the socket option (O_NONBLOCK) for non-blocking socket
+    if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) == -1)
 		throw(std::runtime_error("faild to set option (O_NONBLOCK) on socket"));
-    if (bind(_serverSocket, (struct sockaddr *)&add, sizeof(add)) == -1) //-> bind the socket to the address
+    if (bind(_serverSocket, (struct sockaddr *)&add, sizeof(add)) == -1)
 		throw(std::runtime_error("faild to bind socket"));
-	if (listen(_serverSocket, SOMAXCONN) == -1) //-> listen for incoming connections and making the socket a passive socket
+	if (listen(_serverSocket, SOMAXCONN) == -1)
 		throw(std::runtime_error("listen() faild"));
 
-    new_poll.fd = _serverSocket; //-> add the server socket to the pollfd
-	new_poll.events = POLLIN; //-> set the event to POLLIN for reading data
-	new_poll.revents = 0; //-> set the revents to 0
-	_pollFds.push_back(new_poll); //-> add the server socket to the pollfd
+    new_poll.fd = _serverSocket;
+	new_poll.events = POLLIN;
+	new_poll.revents = 0;
+	_pollFds.push_back(new_poll);
 }
 
 void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
