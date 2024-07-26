@@ -4,6 +4,7 @@
 # include <string>
 # include <vector>
 # include <map>
+# include <set>
 
 # define MODE_O 0x1
 # define MODE_P 0x2
@@ -27,6 +28,7 @@ private:
     std::string _key;
     unsigned int _limit;
     unsigned int _modes;
+    std::set<std::string> _invited;
     std::map<Client*, bool> _members;
 
 public:
@@ -66,6 +68,10 @@ public:
     void removeMode(unsigned int mode);
     bool hasMode(unsigned int mode) const;
     std::string getMode() const;
+
+    void addInvite(std::string clientName);
+    void removeInvite(std::string clientName);
+    bool isInvited(std::string clientName);
 };
 
 #endif

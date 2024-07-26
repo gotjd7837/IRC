@@ -133,3 +133,18 @@ std::string Channel::getMode() const
 
     return mode;
 }
+
+void Channel::addInvite(std::string clientName)
+{
+    _invited.insert(clientName);
+}
+
+void Channel::removeInvite(std::string clientName)
+{
+    _invited.erase(clientName);
+}
+
+bool Channel::isInvited(std::string clientName)
+{
+    return (_invited.find(clientName) != _invited.end());
+}

@@ -41,6 +41,8 @@ void Server::cmdInvite(MessageProtocol& parsedMessage, int clientFd)
             ucastMsg(clientFd, "401 " + nickName + " :No such nick/channel");
             return ;
         }
+
+        channel->addInvite(nickName);
         // 초대 받은 사람에게 보내는 메세지
         ucastMsg(targetClient->getFd(), client->getPrefix() + " INVITE " + targetClient->getNick() + " " + channelName);
         
