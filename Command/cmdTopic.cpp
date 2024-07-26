@@ -8,6 +8,12 @@ void Server::cmdTopic(MessageProtocol& parsedMessage, int clientFd)
     Client* client = getClient(clientFd);
     std::string channelName = parsedMessage.getParams()[0];
     Channel* channel = getChannel(channelName);
+
+    if (!client->isRegistered())
+    {
+        ucastMsg(clientFd, "451 TOPIC :You have not registered");
+        return ;
+    }
     if (channel == nullptr)
     {
         ucastMsg(clientFd, "403 " + channelName + " :No such channel");

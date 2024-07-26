@@ -29,6 +29,7 @@ class Client
         ~Client();
         int getFd();
         bool getCert();
+        bool isRegistered();
         std::string getPass();
         std::string getNick();
         std::string getUser();

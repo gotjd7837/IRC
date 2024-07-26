@@ -3,6 +3,18 @@
 #include "../MessageProtocol/MessageProtocol.hpp"
 #include "../Channel/Channel.hpp"
 
+bool validCheckNick(std::string nick)
+{
+    for (unsigned long i = 0; i < nick.size(); i++)
+    {
+        if (isdigit(nick[i]) || isalpha(nick[i]) || nick[i] == '_' || nick[i] == '-')
+            continue ;
+        else
+            return (false);
+    }
+    return (true);
+}
+
 void Server::cmdNick(MessageProtocol& parsedMessage, int clientFd)
 {
     Client* cli = getClient(clientFd);
@@ -13,6 +25,11 @@ void Server::cmdNick(MessageProtocol& parsedMessage, int clientFd)
         clientCert(clientFd);
     if (!cli->getCert())
         return ;
+    if (!validCheckNick(parsedMessage.getParams()[0]) || parsedMessage.getParams().size() > 1)
+    {
+        ucastMsg(clientFd, "432 " + parsedMessage.getParams()[0] + " :Erroneus nickname");
+        return ;
+    }
 
     std::string oldNick = cli->getNick();
 

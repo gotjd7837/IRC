@@ -8,6 +8,12 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
     Client* client = getClient(clientFd);
     std::string channelName = parsedMessage.getParams()[0];
     Channel* channel = getChannel(channelName);
+
+    if (!client->isRegistered())
+    {
+        ucastMsg(clientFd, "451 MODE :You have not registered");
+        return ;
+    }
     if (parsedMessage.getParams().size() < 2 || channel == nullptr)
         return ;
     if (channel->isOper(client) == false)

@@ -24,6 +24,11 @@ void Server::cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd)
 {
     Client* cli = getClient(clientFd);
 
+    if (!cli->isRegistered())
+    {
+        ucastMsg(clientFd, "451 PRIVMSG :You have not registered");
+        return ;
+    }
     if (parsedMessage.getParams().size() < 2)
         ucastMsg(clientFd, std::string("461 " + cli->getNick() + " PRIVMSG :Not enough parameters"));
 
@@ -31,9 +36,10 @@ void Server::cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd)
 
     for (std::vector<std::string>::iterator it = targetlist.begin(); it != targetlist.end(); it++)
     {
-        if (isalpha((*it)[0])) // to user
+        if (isalpha((*it)[0]) || isdigit((*it)[0])) // to user
         {
-            for (std::map<int, Client*>::iterator cliit = _clients.begin(); cliit != _clients.end(); cliit++)
+            std::map<int, Client*>::iterator cliit;
+            for (cliit = _clients.begin(); cliit != _clients.end(); cliit++)
             {
                 if (cliit->second->getNick() == (*it))
                 {
@@ -41,12 +47,14 @@ void Server::cmdPrivMsg(MessageProtocol& parsedMessage, int clientFd)
                     break ;
                 }
             }
+            if (cliit == _clients.end())
+                ucastMsg(clientFd, std::string("401 " + cli->getNick() + " " + (*it) + " :No such nick/channel"));
         }
         else // to channel
         {
             std::map<std::string, Channel*>::iterator chait = _channels.find(*it);
             if (chait == _channels.end())
-                ucastMsg(clientFd, std::string("403 " + cli->getNick() + " " + chait->first + " :No such channel"));
+                ucastMsg(clientFd, std::string("403 " + cli->getNick() + " " + (*it) + " :No such channel"));
             else
             {
                 if (!chait->second->isMember(cli))

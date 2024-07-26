@@ -24,6 +24,11 @@ void Server::cmdJoin(MessageProtocol& parsedMessage, int clientFd)
 {
     Client* cli = getClient(clientFd);
 
+    if (!cli->isRegistered())
+    {
+        ucastMsg(clientFd, "451 JOIN :You have not registered");
+        return ;
+    }
     if (parsedMessage.getParams().empty())
         ucastMsg(clientFd, std::string("461 " + cli->getNick() + " JOIN :Not enough parameters"));
     

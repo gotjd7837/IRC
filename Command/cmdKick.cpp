@@ -5,15 +5,20 @@
 
 void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
 {
+    std::string channelName = parsedMessage.getParams()[0];
+    Client* client = getClient(clientFd);
+    Channel* channel = getChannel(channelName);
+
+    if (!client->isRegistered())
+    {
+        ucastMsg(clientFd, "451 KICK :You have not registered");
+        return ;
+    }
     if (parsedMessage.getParams().size() < 2)
     {
         ucastMsg(clientFd, std::string("461 " + getClient(clientFd)->getNick() + " KICK :Not enough parameters"));
         return ;
     }
-
-    std::string channelName = parsedMessage.getParams()[0];
-    Client* client = getClient(clientFd);
-    Channel* channel = getChannel(channelName);
     if (channel == nullptr)
     {
         ucastMsg(clientFd, std::string("403 " + client->getNick() + " " + channelName + " :No such channel"));

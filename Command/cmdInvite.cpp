@@ -20,6 +20,11 @@ void Server::cmdInvite(MessageProtocol& parsedMessage, int clientFd)
     Channel* channel = getChannel(channelName);
     Client* client = getClient(clientFd);
 
+    if (!client->isRegistered())
+    {
+        ucastMsg(clientFd, "451 INVITE :You have not registered");
+        return ;
+    }
     if (parsedMessage.getParams().size() < 2)
     {
         ucastMsg(clientFd, "461 " + channelName + " INVITE :Not enough parameters");

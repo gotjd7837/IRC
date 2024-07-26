@@ -9,6 +9,11 @@ void Server::cmdPart(MessageProtocol& parsedMessage, int clientFd)
     Client* client = getClient(clientFd);
     Channel* channel = getChannel(channelName);
 
+    if (!client->isRegistered())
+    {
+        ucastMsg(clientFd, "451 PART :You have not registered");
+        return ;
+    }
     if (parsedMessage.getParams().empty())
     {
         ucastMsg(clientFd, std::string("461 " + client->getNick() + " PART :Not enough parameters"));

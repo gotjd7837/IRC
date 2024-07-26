@@ -158,7 +158,7 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         cmdTopic(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "INVITE")
         cmdInvite(parsedMessage, clientFd);
-    else if (parsedMessage.getCommand() == "WHO")
+    else if (parsedMessage.getCommand() == "WHO" || parsedMessage.getCommand() == "WHOIS")
         return ;
     else
         ucastMsg(clientFd, getClient(clientFd)->getPrefix() + " 421 " 

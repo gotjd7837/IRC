@@ -83,3 +83,8 @@ std::string Client::getPrefix()
 {
     return (":" + _nickname + "!" + _username + "@" + _ipaddr);
 }
+
+bool Client::isRegistered()
+{
+    return (this->getUser() != "");
+}
