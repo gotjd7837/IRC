@@ -14,7 +14,7 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
         ucastMsg(clientFd, "451 MODE :You have not registered");
         return ;
     }
-    if (parsedMessage.getParams().size() < 2 || channel == nullptr)
+    if (parsedMessage.getParams().size() < 2 || channel == NULL)
         return ;
     if (channel->isOper(client) == false)
     {
@@ -52,7 +52,7 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
         }
         std::string nick = parsedMessage.getParams()[2];
         Client* target = channel->getMember(nick);
-        if (target == nullptr)
+        if (target == NULL)
         {
             ucastMsg(clientFd, std::string("401 " + client->getNick() + " " + nick + " :No such nick/channel"));
             return ;
@@ -69,7 +69,7 @@ void Server::cmdMode(MessageProtocol& parsedMessage, int clientFd)
         }
         std::string nick = parsedMessage.getParams()[2];
         Client* target = channel->getMember(nick);
-        if (target == nullptr)
+        if (target == NULL)
         {
             ucastMsg(clientFd, std::string("401 " + client->getNick() + " " + nick + " :No such nick/channel"));
             return ;

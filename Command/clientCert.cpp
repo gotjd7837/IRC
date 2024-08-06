@@ -5,7 +5,7 @@
 void Server::clientCert(int clientFd)
 {
     Client* cli = getClient(clientFd);
-    if (cli == nullptr)
+    if (cli == NULL)
         return ;
 
     if (cli->getPass() == this->_password)

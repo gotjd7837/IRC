@@ -99,7 +99,7 @@ Client* Channel::getMember(const std::string& nick) const
         if (it->first->getNick() == nick)
             return (it->first);
     }
-    return (nullptr);
+    return (NULL);
 }
 
 void Channel::addMode(unsigned int mode)

@@ -2,7 +2,7 @@ NAME = ircserv
 
 CC = c++
 
-FLAGS = -Werror -Wall -Wextra -std=c++98
+FLAGS = -Werror -Wall -Wextra
 
 SOURCES = $(wildcard *.cpp */*.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)

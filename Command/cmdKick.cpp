@@ -19,7 +19,7 @@ void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
         ucastMsg(clientFd, std::string("461 " + getClient(clientFd)->getNick() + " KICK :Not enough parameters"));
         return ;
     }
-    if (channel == nullptr)
+    if (channel == NULL)
     {
         ucastMsg(clientFd, std::string("403 " + client->getNick() + " " + channelName + " :No such channel"));
         return ;
@@ -32,7 +32,7 @@ void Server::cmdKick(MessageProtocol& parsedMessage, int clientFd)
 
     std::string targetNick = parsedMessage.getParams()[1];
     Client* targetClient = channel->getMember(targetNick);
-    if (targetClient == nullptr)
+    if (targetClient == NULL)
     {
         ucastMsg(clientFd, std::string("441 " + client->getNick() + " " + targetNick + " :They aren't on that channel"));
         return ;

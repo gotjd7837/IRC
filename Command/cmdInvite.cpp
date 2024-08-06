@@ -10,7 +10,7 @@ Client* Server::findClientByNick(std::string nick)
         if (it->second->getNick() == nick)
             return (it->second);
     }
-    return (nullptr);
+    return (NULL);
 }
 
 void Server::cmdInvite(MessageProtocol& parsedMessage, int clientFd)
@@ -30,18 +30,18 @@ void Server::cmdInvite(MessageProtocol& parsedMessage, int clientFd)
         ucastMsg(clientFd, "461 " + channelName + " INVITE :Not enough parameters");
         return ;
     }
-    if (channel == nullptr)
+    if (channel == NULL)
     {
         ucastMsg(clientFd, "403 " + channelName + " :No such channel");
         return ;
     }
 
     Client* targetClient = channel->getMember(nickName);
-    if (targetClient == nullptr)
+    if (targetClient == NULL)
     {
         // 초대 프로세스
         targetClient = findClientByNick(nickName);
-        if (targetClient == nullptr)
+        if (targetClient == NULL)
         {
             ucastMsg(clientFd, "401 " + nickName + " :No such nick/channel");
             return ;

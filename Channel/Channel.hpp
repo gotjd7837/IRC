@@ -5,6 +5,7 @@
 # include <vector>
 # include <map>
 # include <set>
+# include <climits>
 
 # define MODE_O 0x1
 # define MODE_P 0x2
