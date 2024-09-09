@@ -79,6 +79,19 @@ void Client::pushMessageBuff(std::string& message)
     _messageBuff += message;
 }
 
+std::string Client::popSendBuff()
+{
+    std::string remainMessage = _sendBuff;
+
+    _sendBuff.clear();
+    return (remainMessage);
+}
+
+void Client::pushSendBuff(std::string& message)
+{
+    _sendBuff += message;
+}
+
 std::string Client::getPrefix()
 {
     return (":" + _nickname + "!" + _username + "@" + _ipaddr);

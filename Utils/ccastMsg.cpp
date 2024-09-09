@@ -5,9 +5,7 @@
 
 void Server::ccastMsg(std::string channelName, std::string msg)
 {
-    msg += "\r\n";
-
     std::cout << GRE << "send to <" << channelName << "> : " << msg << WHI << std::endl;
     for (std::map<Client*, bool>::const_iterator it = _channels[channelName]->getMembers().begin(); it != _channels[channelName]->getMembers().end(); it++)
-        send(it->first->getFd(), msg.c_str(), msg.size(), 0);
+        ucastMsg(it->first->getFd(), msg);
 }

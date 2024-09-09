@@ -30,7 +30,7 @@ void Server::cmdPart(MessageProtocol& parsedMessage, int clientFd)
         return ;
     }
     
-    ccastMsg(channelName, std::string(client->getPrefix() + " PART " + channelName + " " + parsedMessage.getParams()[1]));
+    ccastMsg(channelName, std::string(client->getPrefix() + " PART " + channelName));
     ucastMsg(clientFd, std::string("442 " + client->getNick() + " " + channelName + " :You have left the channel"));
     channel->removeMember(client);
     if (channel->getMembers().empty())

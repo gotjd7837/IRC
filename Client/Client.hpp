@@ -23,7 +23,8 @@ class Client
         std::string _realname;
         std::string _password;
         std::string _messageBuff;
-    
+        std::string _sendBuff;
+
     public :
         Client();
         ~Client();
@@ -43,6 +44,8 @@ class Client
 
         std::string popMessageBuff();
         void pushMessageBuff(std::string& message);
+        std::string popSendBuff();
+        void pushSendBuff(std::string& message);
 
         std::string getPrefix();
 };

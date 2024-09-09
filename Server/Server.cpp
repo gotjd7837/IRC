@@ -56,7 +56,6 @@ void Server::removeClient(int clientFd)
 
 void Server::addClient()
 {
-    Client *cli = new Client();
     struct pollfd new_poll;
 
     struct sockaddr_in add;
@@ -74,6 +73,7 @@ void Server::addClient()
     new_poll.revents = 0;
     _pollFds.push_back(new_poll);
 
+    Client *cli = new Client();
     cli->setFd(new_fd);
     cli->setIpaddr(inet_ntoa(add.sin_addr));
     _clients[new_fd] = cli;
@@ -158,7 +158,7 @@ void Server::excuteCommand(MessageProtocol parsedMessage, int clientFd)
         cmdTopic(parsedMessage, clientFd);
     else if (parsedMessage.getCommand() == "INVITE")
         cmdInvite(parsedMessage, clientFd);
-    else if (parsedMessage.getCommand() == "WHO" || parsedMessage.getCommand() == "WHOIS")
+    else if (parsedMessage.getCommand() == "WHO" || parsedMessage.getCommand() == "WHOIS" || parsedMessage.getCommand() == "CAP")
         return ;
     else
         ucastMsg(clientFd, getClient(clientFd)->getPrefix() + " 421 " 
